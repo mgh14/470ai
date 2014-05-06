@@ -71,6 +71,41 @@ class Agent:
 		#print "(end list)"
 
 		return tanksInfo
+		
+	def queryObstacles(self):
+		self.socket.write("obstacles\n")
+		response = self.socket.read_until("\n")
+		obstacles = self.socket.read_until("end\n")
+		obstaclesInfo = self._parseList(obstacles)
+		return obstaclesInfo
+		
+	def getObstacles(self):
+		obstacles = self.queryObstacles()
+		obstacleList = []
+		
+		for obs in obstacles:
+			p1 = (obs[1],obs[2])
+			p2 = (obs[3],obs[4])
+			p3 = (obs[5],obs[6])
+			p4 = (obs[7],obs[8])
+			obsTuple = (p1,p2,p3,p4)
+			obstacleList.append(obsTuple)
+			
+		return obstacleList
+		
+	def queryFlags(self):
+		self.socket.write("flags\n")
+		response = self.socket.read_until("\n")
+		flags = self.socket.read_until("end\n")
+		flagsInfo = self._parseList(flags)
+		return flagsInfo
+		
+	def query(self, qString):
+		self.socket.write(qString+"\n")
+		response = self.socket.read_until("\n")
+		response = self.socket.read_until("end\n")
+		info = self._parseList(response)
+		return info
 
 	def getAdjustedAngle(self,rawAngle):
 		if(rawAngle >= 0 and rawAngle < math.pi):
