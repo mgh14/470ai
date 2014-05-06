@@ -9,9 +9,9 @@ class DumbAgent(Agent):
 		return (3.0 + (random.random() * 5))	# between 3.0 and 8.0 seconds
 	
 	def play(self):		# driver function for beginning AI simulation
-		tanksInfo = self.queryMyTanks()
+		tanksInfo = self._query("mytanks")
 
-		angle = self.getAdjustedAngle(float(tanksInfo[0][9]))
+		angle = self.getAdjustedAngle(float(tanksInfo[0][8]))
 
 		# assign shooting tolerance (tolerance is a measure of time)
 		shootTolerance = self.getRandomShotTolerance()
@@ -32,13 +32,13 @@ class DumbAgent(Agent):
 
 			# check to see if the tank should rotate
 			if(moveTolerance < (currTime - moveTime)):
-				tanksInfo = self.queryMyTanks()
-				newAngle = self.getAdjustedAngle(float(tanksInfo[0][9]))
+				tanksInfo = self._query("mytanks")
+				newAngle = self.getAdjustedAngle(float(tanksInfo[0][8]))
 				angleDifference = newAngle - angle
 				if(newAngle < angle):
 					angleDifference = angle - newAngle
 				#print "Angles: " + str(newAngle) + " " + str(angle) + " " + str(angleDifference)
-				angularVelocity = float(tanksInfo[0][12])
+				angularVelocity = float(tanksInfo[0][11])
 				#print "AngVel: " + str(angularVelocity) + " " + str(angularVelocity == 0.0)
 
 				if(angularVelocity == 0.0): # start rotating
