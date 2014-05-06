@@ -126,7 +126,7 @@ def plot_field(function):
                 for y in linspace(start, end, SAMPLES))
        
     for x, y in points:
-        f_x, f_y = function(x, y)
+        f_x, f_y = function(x, y, [(-370,0),(370,0),(0,-370)])
         plotvalues = gpi_point(x, y, f_x, f_y)
         if plotvalues is not None:
             x1, y1, x2, y2 = plotvalues
@@ -134,27 +134,37 @@ def plot_field(function):
     s += 'e\n'
     return s
     
-def calculate_attractive_field(x, y):
+def calculate_attractive_field(x, y, goals):
 	a = 1
 	s = 80
-	goalX = -370
-	goalY = 0
 	r = 80
 	
-	d = math.sqrt((goalX - x)**2 + (y - goalY)**2)
-	theta = math.atan2((goalY-y),(goalX-x))
+	vx = 0
+	vy = 0
+	d = 10000
+	goalX = "not_set"
+	goalY = "not_set"
+	
+	for goal in goals:
+		gX = goal[0]
+		gY = goal[1]
+		if d > math.sqrt((gX - x)**2 + (y - gY)**2):
+			goalX = gX
+			goalY = gY
+			d = math.sqrt((goalX - x)**2 + (y - goalY)**2)
+			theta = math.atan2((goalY-y),(goalX-x))
 	
 	if d < r:
-		return 0,0
+		vx = 0
+		vy = 0
 	elif r <= d and d <= s+r:
-		vx = a * (d-r) * math.cos(theta)
-		vy = a * (d-r) * math.sin(theta)
-		return vx,vy
+		vx += a * (d-r) * math.cos(theta)
+		vy += a * (d-r) * math.sin(theta)
 	elif d > s+r:
-		vx = a * s * math.cos(theta)
-		vy = a * s * math.sin(theta)
-		return vx, vy
-		
+		vx += a * s * math.cos(theta)
+		vy += a * s * math.sin(theta)
+	
+	return vx,vy
 	
 	
 	
