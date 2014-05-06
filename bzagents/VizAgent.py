@@ -124,7 +124,7 @@ def plot_field(function):
 
     points = ((x, y) for x in linspace(start, end, SAMPLES)
                 for y in linspace(start, end, SAMPLES))
-
+       
     for x, y in points:
         f_x, f_y = function(x, y)
         plotvalues = gpi_point(x, y, f_x, f_y)
@@ -134,30 +134,35 @@ def plot_field(function):
     s += 'e\n'
     return s
     
-class VizAgent(Agent):
+def calculate_attractive_field(x, y):
+	a = 1
+	s = 80
+	goalX = -370
+	goalY = 0
+	r = 80
 	
-	def getObstacles(self):
-		obstacles = self.queryObstacles()
-		obstacleList = []
+	d = math.sqrt((goalX - x)**2 + (y - goalY)**2)
+	theta = math.atan2((goalY-y),(goalX-x))
+	
+	if d < r:
+		return 0,0
+	elif r <= d and d <= s+r:
+		vx = a * (d-r) * math.cos(theta)
+		vy = a * (d-r) * math.sin(theta)
+		return vx,vy
+	elif d > s+r:
+		vx = a * s * math.cos(theta)
+		vy = a * s * math.sin(theta)
+		return vx, vy
 		
-		for obs in obstacles:
-			p1 = (obs[1],obs[2])
-			p2 = (obs[3],obs[4])
-			p3 = (obs[5],obs[6])
-			p4 = (obs[7],obs[8])
-			obsTuple = (p1,p2,p3,p4)
-			obstacleList.append(obsTuple)
-			
-		return obstacleList
-			
-		
 	
 	
 	
-ag = VizAgent("localhost", 57426);
+ag = Agent("localhost", 57426);
+
 
 outfile = open(FILENAME, 'w')
 print >>outfile, gnuplot_header(-WORLDSIZE / 2, WORLDSIZE / 2)
 print >>outfile, draw_obstacles(ag.getObstacles())
 field_function = generate_field_function(150)
-print >>outfile, plot_field(field_function)
+print >>outfile, plot_field(calculate_attractive_field)
