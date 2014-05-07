@@ -19,6 +19,7 @@ class Agent(object):
 	socket = NOT_SET
 	constants = dict()
 	iHaveEnemyFlag = False
+	worldHalfSize = -1
 
 	def __init__(self, ip, port):
 		self.ipAddr = ip
@@ -45,6 +46,8 @@ class Agent(object):
 		constList = self._query("constants")
 		for item in constList:
 			self.constants[item[0]] = item[1]
+
+		self.worldHalfSize = int(self.constants["worldsize"]) / 2
 
 	def commandAgent(self, command):
 		print "Cmd: " + command
@@ -88,7 +91,6 @@ class Agent(object):
 		positions = []
 		for flag in flags:
 			if(flag[0] == self.constants["team"]):
-				print "skipping: " + self.constants["team"]
 				continue
 
 			positions.append((int(float(flag[2])),int(float(flag[3]))))
