@@ -19,7 +19,8 @@ class Agent(object):
 	socket = NOT_SET
 	constants = dict()
 	iHaveEnemyFlag = False
-	worldHalfSize = -1
+	worldHalfSize = NOT_SET
+	myBaseCoords = NOT_SET
 
 	def __init__(self, ip, port):
 		self.ipAddr = ip
@@ -37,6 +38,7 @@ class Agent(object):
 		# register and prepare agent
 		self.registerAgent()
 		self.loadConstants()
+		self.setMyBase()
 
 	def registerAgent(self):		
 		self.socket.write("agent 1" + self.SERVER_DELIMITER)
@@ -48,6 +50,20 @@ class Agent(object):
 			self.constants[item[0]] = item[1]
 
 		self.worldHalfSize = int(self.constants["worldsize"]) / 2
+
+	def setMyBase(self):
+		bases = self._query("bases")
+
+		for base in bases:
+			if(base[0] == self.constants["team"]):
+				self.myBaseCoords = [(int(float(base[1])),int(float(base[2]))),
+							(int(float(base[3])),int(float(base[4]))),
+							(int(float(base[5])),int(float(base[6]))),
+							(int(float(base[7])),int(float(base[8])))]
+
+				return
+
+		print "Error: no base assigned!"
 
 	def commandAgent(self, command):
 		print "Cmd: " + command
@@ -84,6 +100,45 @@ class Agent(object):
 		for current in listToPrint:
 			print str(current)
 		print "(end list)"
+
+	def _isMyFlagInMyBase(self):
+		flags = self._query("flags")
+
+		for flag in flags:
+			if(flag[0] == self.constants["team"]):
+				flagCoords = self._getMyFlagPosition()
+				# top-right corner check
+				trCorner = (flagCoords[0] < self.myBaseCoords[0][0] and 					flagCoords[1] < self.myBaseCoords[0][1])
+
+				# bottom-right corner check
+				brCorner = (flagCoords[0] < self.myBaseCoords[1][0] and 					flagCoords[1] > self.myBaseCoords[1][1])
+
+				# bottom-left corner check
+				blCorner = (flagCoords[0] > self.myBaseCoords[2][0] and 					flagCoords[1] > self.myBaseCoords[2][1])
+
+				# top-left corner check
+				tlCorner = (flagCoords[0] > self.myBaseCoords[3][0] and 					flagCoords[1] < self.myBaseCoords[3][1])
+
+				return (trCorner and brCorner and blCorner and tlCorner)
+		return -1
+
+	def _isMyFlagCaptured(self):
+		flags = self._query("flags")
+
+		for flag in flags:
+			if(flag[0] == self.constants["team"]):
+				return (not (flag[1] == self.constants["team"]))
+
+		return -1
+
+	def _getMyFlagPosition(self):
+		flags = self._query("flags")
+
+		for flag in flags:
+			if(flag[0] == self.constants["team"]):
+				return [int(float(flag[2])),int(float(flag[3]))]
+
+		return [-10000,-10000]	# represents an error (should be found above)
 
 	def _getEnemyFlagPositions(self):
 		flags = self._query("flags")

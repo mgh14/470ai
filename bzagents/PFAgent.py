@@ -22,29 +22,33 @@ class PFAgent(Agent):
 				colY.append(0)
 			self.fieldX.append(colX)
 			self.fieldY.append(colY)
+
+	### aggregated field methods
+	def calculatePF(self):
+		otherTanks = self._query("othertanks")
+		goals = self._getEnemyFlagPositions()
+		flagPosition = self._getMyFlagPosition()
+		for x in range((-1*self.worldHalfSize),self.worldHalfSize):
+			for y in range((-1*self.worldHalfSize),self.worldHalfSize):
+				self.calculateAttractiveFieldAtPoint(x,y,goals)
+
+				for tank in otherTanks:
+					self.calculateRepulsiveFieldAtPoint(x,y,tank)
+
+				if(not self._isMyFlagCaptured()):
+					self.calculateTangentialFieldAtPoint(x,y,flagPosition)
+
+	### attractive field methods
+	def calculateAttractivePF(self):
+		#if(self.hasEnemyFlag):
+		#	 calculate base position
+		#	return
+
+		goals = self._getEnemyFlagPositions()
+		for x in range((-1*self.worldHalfSize),self.worldHalfSize):
+			for y in range((-1*self.worldHalfSize),self.worldHalfSize):
+				self.calculateAttractiveFieldAtPoint(x,y,goals)
 	
-	def getDistanceToEnemyTank(self,x,y,tankInfo):
-		tankXPos = int(float(tankInfo[4]))
-		tankYPos = int(float(tankInfo[5]))
-
-		distance = math.sqrt((tankXPos-x)**2 + (tankYPos - y)**2)
-
-		#print distance
-		return distance
-
-	def getAngleToEnemyTank(self,x,y,tankInfo):
-		tankXPos = int(float(tankInfo[4]))
-		tankYPos = int(float(tankInfo[5]))
-
-		#print "angleCalc: " + str(x) + ", " + str(y) + "; " + str(tankXPos) + ","+str(tankYPos)
-		if(tankYPos == y):
-			#print "returning 0"
-			return 0
-
-		angle = math.atan2((tankYPos-y),(tankXPos-x))
-
-		return (angle);
-	    
 	def calculateAttractiveFieldAtPoint(self, x, y, goals):
 		fieldStrength = 1
 		
@@ -68,7 +72,7 @@ class PFAgent(Agent):
 				theta = math.atan2((goalY-y),(goalX-x))
 	
 		const = fieldStrength * (distance-innerRadius)
-		if innerRadius <= distance and distance <= outerRadius:
+		if innerRadius <= distance and distance <= innerRadius+outerRadius:
 			deltaX = const * math.cos(theta)
 			deltaY = const * math.sin(theta)
 		elif distance > outerRadius:
@@ -79,27 +83,18 @@ class PFAgent(Agent):
 		self.fieldX[x][y] += deltaX
 		self.fieldY[x][y] += deltaY
 
-	def calculatePF(self):
+	### repulsive field methods
+	def calculateRepulsivePF(self):
 		otherTanks = self._query("othertanks")
-		goals = self._getEnemyFlagPositions()
-		for x in range((-1*self.worldHalfSize),self.worldHalfSize):
-			for y in range((-1*self.worldHalfSize),self.worldHalfSize):
-				self.calculateAttractiveFieldAtPoint(x,y,goals)
 
-				for tank in otherTanks:
+		fieldStrength = .50
+		
+		# check distance from point to each enemy tank
+		for tank in otherTanks:
+			for x in range((-1*self.worldHalfSize),self.worldHalfSize):
+				for y in range((-1*self.worldHalfSize),self.worldHalfSize):
 					self.calculateRepulsiveFieldAtPoint(x,y,tank)
 
-
-	def calculateAttractivePF(self):
-		#if(self.hasEnemyFlag):
-		#	 calculate base position
-		#	return
-
-		goals = self._getEnemyFlagPositions()
-		for x in range((-1*self.worldHalfSize),self.worldHalfSize):
-			for y in range((-1*self.worldHalfSize),self.worldHalfSize):
-				self.calculateAttractiveFieldAtPoint(x,y,goals)
-	
 	def calculateRepulsiveFieldAtPoint(self, x, y, tank):
 		distance = self.getDistanceToEnemyTank(x,y,tank)
 		if(distance > self.SEMI_CLOSE_TO_ENEMY):
@@ -129,14 +124,25 @@ class PFAgent(Agent):
 		self.fieldX[x][y] += deltaX
 		self.fieldY[x][y] += deltaY
 
-	def calculateRepulsivePF(self):
-		otherTanks = self._query("othertanks")
+	def getDistanceToEnemyTank(self,x,y,tankInfo):
+		tankXPos = int(float(tankInfo[4]))
+		tankYPos = int(float(tankInfo[5]))
 
-		fieldStrength = .50
-		
-		# check distance from point to each enemy tank
-		for tank in otherTanks:
-			for x in range((-1*self.worldHalfSize),self.worldHalfSize):
-				for y in range((-1*self.worldHalfSize),self.worldHalfSize):
-					self.calculateRepulsiveFieldAtPoint(x,y,tank)
+		distance = math.sqrt((tankXPos-x)**2 + (tankYPos - y)**2)
+
+		#print distance
+		return distance
+
+	def getAngleToEnemyTank(self,x,y,tankInfo):
+		tankXPos = int(float(tankInfo[4]))
+		tankYPos = int(float(tankInfo[5]))
+
+		#print "angleCalc: " + str(x) + ", " + str(y) + "; " + str(tankXPos) + ","+str(tankYPos)
+		if(tankYPos == y):
+			#print "returning 0"
+			return 0
+
+		angle = math.atan2((tankYPos-y),(tankXPos-x))
+
+		return (angle);	    
 	
