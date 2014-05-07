@@ -2,7 +2,7 @@ from Agent import *
 
 class PFAgent(Agent):
 	# constants
-	CLOSE_TO_ENEMY = 30 # within a radius of 30 pixels to the enemy
+	CLOSE_TO_ENEMY = 30 	# within a radius of 30 pixels of the enemy
 	SEMI_CLOSE_TO_ENEMY = 2*CLOSE_TO_ENEMY
 
 	# member variables
@@ -36,7 +36,7 @@ class PFAgent(Agent):
 					self.calculateRepulsiveFieldAtPoint(x,y,tank)
 
 				if(not self._isMyFlagCaptured()):
-					self.calculateTangentialFieldAtPoint(x,y,flagPosition)
+					self.calculateTangentialFieldAtPoint(x,y)
 
 	### attractive field methods
 	def calculateAttractivePF(self):
@@ -146,3 +146,7 @@ class PFAgent(Agent):
 
 		return (angle);	    
 	
+	### tangential field methods
+	def calculateTangentialFieldAtPoint(x,y):
+		# write method here -- reference the other two '*AtPoint' methods above
+		return
