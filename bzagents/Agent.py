@@ -152,6 +152,18 @@ class Agent(object):
 
 		return positions
 
+	def _iHaveEnemyFlag(self):
+		flags = self._query("flags")
+
+		for flag in flags:
+			if(flag[0] == self.constants["team"]):	# don't count my own flag
+				continue
+
+			if(flag[1] == self.constants["team"]):
+				return True
+
+		return False
+
 	def getAdjustedAngle(self,rawAngle):
 		twoPi = 2*math.pi
 		if(rawAngle > twoPi):

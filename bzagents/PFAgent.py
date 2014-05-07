@@ -26,28 +26,25 @@ class PFAgent(Agent):
 	### aggregated field methods
 	def calculatePF(self):
 		otherTanks = self._query("othertanks")
-		goals = self._getEnemyFlagPositions()
-		flagPosition = self._getMyFlagPosition()
+	
+		attractiveGoalParam = self._getAttractiveGoalParam()
+		myFlagCaptured = self._isMyFlagCaptured()
 		for x in range((-1*self.worldHalfSize),self.worldHalfSize):
 			for y in range((-1*self.worldHalfSize),self.worldHalfSize):
-				self.calculateAttractiveFieldAtPoint(x,y,goals)
+				self.calculateAttractiveFieldAtPoint(x,y,attractiveGoalParam)
 
 				for tank in otherTanks:
 					self.calculateRepulsiveFieldAtPoint(x,y,tank)
 
-				if(not self._isMyFlagCaptured()):
+				if(not myFlagCaptured):
 					self.calculateTangentialFieldAtPoint(x,y)
 
 	### attractive field methods
 	def calculateAttractivePF(self):
-		#if(self.hasEnemyFlag):
-		#	 calculate base position
-		#	return
-
-		goals = self._getEnemyFlagPositions()
+		attractiveGoalParam = self._getAttractiveGoalParam()		
 		for x in range((-1*self.worldHalfSize),self.worldHalfSize):
 			for y in range((-1*self.worldHalfSize),self.worldHalfSize):
-				self.calculateAttractiveFieldAtPoint(x,y,goals)
+				self.calculateAttractiveFieldAtPoint(x,y,attractiveGoalParam)
 	
 	def calculateAttractiveFieldAtPoint(self, x, y, goals):
 		fieldStrength = 1
@@ -82,6 +79,14 @@ class PFAgent(Agent):
 		# assign deltas to delta x, delta y fields		
 		self.fieldX[x][y] += deltaX
 		self.fieldY[x][y] += deltaY
+
+	def _getAttractiveGoalParam(self):
+		param = self._getEnemyFlagPositions()
+		if(self._iHaveEnemyFlag()):
+			param = [self.myBaseCoords[0]]
+
+		return param
+		
 
 	### repulsive field methods
 	def calculateRepulsivePF(self):
@@ -137,9 +142,7 @@ class PFAgent(Agent):
 		tankXPos = int(float(tankInfo[4]))
 		tankYPos = int(float(tankInfo[5]))
 
-		#print "angleCalc: " + str(x) + ", " + str(y) + "; " + str(tankXPos) + ","+str(tankYPos)
 		if(tankYPos == y):
-			#print "returning 0"
 			return 0
 
 		angle = math.atan2((tankYPos-y),(tankXPos-x))
