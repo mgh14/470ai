@@ -195,9 +195,10 @@ class PFAgent(Agent):
 		return (1.5 + random.random())	# between 1.5 and 2.5 seconds
 		
 	def play(self):		# driver function for beginning AI simulation
+		captureTank = 0
 		tanksInfo = self._query("mytanks")
 
-		angle = self.getAdjustedAngle(float(tanksInfo[0][8]))
+		angle = self.getAdjustedAngle(float(tanksInfo[captureTank][8]))
 
 		# assign shooting tolerance (tolerance is a measure of time)
 		shootTolerance = self.getRandomShotTolerance()
@@ -206,29 +207,29 @@ class PFAgent(Agent):
 		while 1:
 			currTime = time.time()
 			tanksInfo = self._query("mytanks")
-			tankXPos = int(tanksInfo[0][6])
-			tankYPos = int(tanksInfo[0][7])
+			tankXPos = int(tanksInfo[captureTank][6])
+			tankYPos = int(tanksInfo[captureTank][7])
 			self.calculateAttractiveFieldAtPoint(tankXPos,tankYPos,self._getAttractiveGoalParam())
 			
 			# check to see if the tank should shoot
-			if(shootTolerance < (currTime - shootTime)):
+			if(shootTolerance < (currTime - shootTime) and not self._isCoordinateInBase((tankXPos,tankYPos))):
 				self.commandAgent("shoot 0")
 				shootTime = currTime
 				shootTolerance = self.getRandomShotTolerance()
 
 			# check to see if the tank should rotate once pointed the right way crank up the speed!
-			tankHeading = self.getAdjustedAngle(float(tanksInfo[0][8]))
+			tankHeading = self.getAdjustedAngle(float(tanksInfo[captureTank][8]))
 			if tankHeading > self.desiredHeading + self.HEADING_TOLERANCE:
-				self.commandAgent("angvel 0 -0.75")
+				self.commandAgent("angvel " + str(captureTank) + " -0.75")
 			elif tankHeading < self.desiredHeading - self.HEADING_TOLERANCE:
-				self.commandAgent("angvel 0 0.75")
+				self.commandAgent("angvel " + str(captureTank) + " 0.75")
 			else:
-				self.commandAgent("angvel 0 0")
+				self.commandAgent("angvel " + str(captureTank) + " 0")
 
 				magnitude = (self.fieldX[tankXPos][tankYPos]**2+self.fieldY[tankXPos][tankYPos]**2)**.5
 				if(magnitude > 1):
 					magnitude = 1
 				if(magnitude < -1):
 					magnitude = -1
-				self.commandAgent("speed 0 " + str(magnitude))
+				self.commandAgent("speed " + str(captureTank) + " " + str(magnitude))
 
