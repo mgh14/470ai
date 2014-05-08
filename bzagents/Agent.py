@@ -21,6 +21,7 @@ class Agent(object):
 	iHaveEnemyFlag = False
 	worldHalfSize = NOT_SET
 	myBaseCoords = NOT_SET
+	myFlagStand = NOT_SET
 
 	def __init__(self, ip, port):
 		self.ipAddr = ip
@@ -39,6 +40,7 @@ class Agent(object):
 		self.registerAgent()
 		self.loadConstants()
 		self.setMyBase()
+		self.setMyFlagStand()
 
 	def registerAgent(self):		
 		self.socket.write("agent 1" + self.SERVER_DELIMITER)
@@ -64,6 +66,13 @@ class Agent(object):
 				return
 
 		print "Error: no base assigned!"
+		
+	def setMyFlagStand(self):
+		flags = self._query("flags")
+		
+		for flag in flags:
+			if(flag[0] == self.constants["team"]):
+				self.myFlagStand = [int(float(flag[2])),int(float(flag[3]))]
 
 	def commandAgent(self, command):
 		print "Cmd: " + command

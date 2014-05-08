@@ -136,25 +136,56 @@ class PFAgent(Agent):
 		tankXPos = int(float(tankInfo[4]))
 		tankYPos = int(float(tankInfo[5]))
 
-		distance = math.sqrt((tankXPos-x)**2 + (tankYPos - y)**2)
-
-		#print distance
-		return distance
+		return self.getDistanceToPoint(x,y,tankXPos,tankYPos)
+		
+	def getDistanceToPoint(self,x,y,px,py):
+		return math.sqrt((px-x)**2 + (py - y)**2)
 
 	def getAngleToEnemyTank(self,x,y,tankInfo):
 		tankXPos = int(float(tankInfo[4]))
 		tankYPos = int(float(tankInfo[5]))
 
-		if(tankYPos == y):
+		return self.getAngleToPoint(x,y,tankXPos,tankYPos)   
+	
+	def getAngleToPoint(self,x,y,px,py):
+		if(py == y):
 			return 0
-
-		angle = math.atan2((tankYPos-y),(tankXPos-x))
-
-		return (angle);	    
+		angle = math.atan2((py-y),(px-x))
+		return (angle);
 	
 	### tangential field methods
-	def calculateTangentialFieldAtPoint(x,y):
-		# write method here -- reference the other two '*AtPoint' methods above
+	def calculateTangentialPF(self):
+		# check distance from point to each enemy tank
+		for x in range((-1*self.worldHalfSize),self.worldHalfSize):
+			for y in range((-1*self.worldHalfSize),self.worldHalfSize):
+				self.calculateTangentialFieldAtPoint(x,y,self.myFlagStand)
+	
+	def calculateTangentialFieldAtPoint(self,x,y,flagStand):
+		distance = self.getDistanceToPoint(x,y,flagStand[0],flagStand[1])
+		if(distance > self.SEMI_CLOSE_TO_ENEMY):
+			return
+
+		fieldStrength = .50
+
+		angle = (self.getAngleToPoint(x,y,flagStand[0],flagStand[1]))
+		angle += 1.5708 #add 90 degrees (in radians)
+
+		deltaX = 0
+		deltaY = 0
+		outerRadius = self.CLOSE_TO_ENEMY + self.SEMI_CLOSE_TO_ENEMY
+		if(distance < self.CLOSE_TO_ENEMY):
+			deltaX = -1 * math.cos(angle)
+			deltaY = -1 * math.sin(angle)
+		elif(distance <= outerRadius):
+			const = -1 * fieldStrength * (outerRadius - distance)
+			deltaX = const * math.cos(angle)
+			deltaY = const * math.sin(angle)
+
+		if(deltaX == 0 and deltaY == 0):
+			return
+
+		self.fieldX[x][y] += deltaX
+		self.fieldY[x][y] += deltaY
 		return
 	
 	def getRandomShotTolerance(self):
@@ -191,3 +222,20 @@ class PFAgent(Agent):
 			else:
 				self.commandAgent("angvel 0 0")
 				self.commandAgent("speed 0 1")
+				
+pfa = PFAgent("localhost", 51995)
+
+# the next two functions are cumulative on the fieldX, fieldY class vars inside pfa
+# (same effect as pfa.calculatePF())
+#pfa.calculateAttractivePF()
+#pfa.calculateRepulsivePF()
+
+# for profiling functions
+#cProfile.run('pfa.calculateAttractiveFieldAtPoint(100,100,[(0, -370), (370, 0), (-370, 0)])')
+
+outfile = open("custom.gpi", 'w')
+print >>outfile, GnuplotUtil.gnuplot_header(-WORLDSIZE / 2, WORLDSIZE / 2)
+#print >>outfile, GnuplotUtil.draw_obstacles(ag.getObstacles())
+print >>outfile, GnuplotUtil.plot_field(pfa.fieldX,pfa.fieldY)
+print >>outfile,'e\n'
+
