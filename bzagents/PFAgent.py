@@ -222,20 +222,4 @@ class PFAgent(Agent):
 			else:
 				self.commandAgent("angvel 0 0")
 				self.commandAgent("speed 0 1")
-				
-pfa = PFAgent("localhost", 51995)
-
-# the next two functions are cumulative on the fieldX, fieldY class vars inside pfa
-# (same effect as pfa.calculatePF())
-#pfa.calculateAttractivePF()
-#pfa.calculateRepulsivePF()
-
-# for profiling functions
-#cProfile.run('pfa.calculateAttractiveFieldAtPoint(100,100,[(0, -370), (370, 0), (-370, 0)])')
-
-outfile = open("custom.gpi", 'w')
-print >>outfile, GnuplotUtil.gnuplot_header(-WORLDSIZE / 2, WORLDSIZE / 2)
-#print >>outfile, GnuplotUtil.draw_obstacles(ag.getObstacles())
-print >>outfile, GnuplotUtil.plot_field(pfa.fieldX,pfa.fieldY)
-print >>outfile,'e\n'
 
