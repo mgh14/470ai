@@ -33,13 +33,13 @@ class PFAgent(Agent):
 		myFlagCaptured = self._isMyFlagCaptured()
 		for x in range((-1*self.worldHalfSize),self.worldHalfSize):
 			for y in range((-1*self.worldHalfSize),self.worldHalfSize):
-				self.calculateAttractiveFieldAtPoint(x,y,attractiveGoalParam)
+				#self.calculateAttractiveFieldAtPoint(x,y,attractiveGoalParam)
 
-				for tank in otherTanks:
-					self.calculateRepulsiveFieldAtPoint(x,y,tank)
+				#for tank in otherTanks:
+				#	self.calculateRepulsiveFieldAtPoint(x,y,tank)
 
-				if(not myFlagCaptured):
-					self.calculateTangentialFieldAtPoint(x,y)
+				#if(not myFlagCaptured):
+				self.calculateTangentialFieldAtPoint(x,y,self.myFlagStand)
 
 	### attractive field methods
 	def calculateAttractivePF(self):
