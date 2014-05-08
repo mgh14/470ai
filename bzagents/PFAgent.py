@@ -51,7 +51,7 @@ class PFAgent(Agent):
 	def calculateAttractiveFieldAtPoint(self, x, y, goals):
 		fieldStrength = 1
 		
-		innerRadius = 80
+		innerRadius = 10
 		outerRadius = 2*innerRadius
 	
 		deltaX = 0
@@ -71,7 +71,10 @@ class PFAgent(Agent):
 				theta = math.atan2((goalY-y),(goalX-x))
 	
 		const = fieldStrength * (distance-innerRadius)
-		if innerRadius <= distance and distance <= innerRadius+outerRadius:
+		if distance < innerRadius:
+			deltaX = 0
+			deltaY = 0
+		elif innerRadius <= distance and distance <= innerRadius+outerRadius:
 			deltaX = const * math.cos(theta)
 			deltaY = const * math.sin(theta)
 		elif distance > outerRadius:
@@ -221,5 +224,11 @@ class PFAgent(Agent):
 				self.commandAgent("angvel 0 0.75")
 			else:
 				self.commandAgent("angvel 0 0")
-				self.commandAgent("speed 0 1")
+
+				magnitude = (self.fieldX[tankXPos][tankYPos]**2+self.fieldY[tankXPos][tankYPos]**2)**.5
+				if(magnitude > 1):
+					magnitude = 1
+				if(magnitude < -1):
+					magnitude = -1
+				self.commandAgent("speed 0 " + str(magnitude))
 
