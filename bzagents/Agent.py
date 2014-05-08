@@ -110,25 +110,27 @@ class Agent(object):
 			print str(current)
 		print "(end list)"
 
+	def _isCoordinateInBase(self, coords):
+		# top-right corner check
+		trCorner = (coords[0] < self.myBaseCoords[0][0] and 						coords[1] < self.myBaseCoords[0][1])
+
+		# bottom-right corner check
+		brCorner = (coords[0] < self.myBaseCoords[1][0] and 						coords[1] > self.myBaseCoords[1][1])
+
+		# bottom-left corner check
+		blCorner = (coords[0] > self.myBaseCoords[2][0] and 						coords[1] > self.myBaseCoords[2][1])
+
+		# top-left corner check
+		tlCorner = (coords[0] > self.myBaseCoords[3][0] and 						coords[1] < self.myBaseCoords[3][1])
+
+		return (trCorner and brCorner and blCorner and tlCorner)
+
 	def _isMyFlagInMyBase(self):
 		flags = self._query("flags")
 
 		for flag in flags:
 			if(flag[0] == self.constants["team"]):
-				flagCoords = self._getMyFlagPosition()
-				# top-right corner check
-				trCorner = (flagCoords[0] < self.myBaseCoords[0][0] and 					flagCoords[1] < self.myBaseCoords[0][1])
-
-				# bottom-right corner check
-				brCorner = (flagCoords[0] < self.myBaseCoords[1][0] and 					flagCoords[1] > self.myBaseCoords[1][1])
-
-				# bottom-left corner check
-				blCorner = (flagCoords[0] > self.myBaseCoords[2][0] and 					flagCoords[1] > self.myBaseCoords[2][1])
-
-				# top-left corner check
-				tlCorner = (flagCoords[0] > self.myBaseCoords[3][0] and 					flagCoords[1] < self.myBaseCoords[3][1])
-
-				return (trCorner and brCorner and blCorner and tlCorner)
+				return self._isCoordinateInBase(self._getMyFlagPosition())
 		return -1
 
 	def _isMyFlagCaptured(self):
