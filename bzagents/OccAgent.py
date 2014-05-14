@@ -21,9 +21,9 @@ class OccAgent(PFAgent):
 
 	def _initializeOcc(self):
 		# initialize the probabilities 
-		for x in range(0,(self.worldHalfSize*2)-1):
+		for x in range(0,self.worldHalfSize*2):
 			col = []
-			for y in range(0,(self.worldHalfSize*2)-1):
+			for y in range(0,self.worldHalfSize*2):
 				col.append(self.BEGINNING_OCCUPIED_ESTIMATE)
 			self.probabilities.append(col)
 
