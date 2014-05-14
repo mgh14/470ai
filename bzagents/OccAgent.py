@@ -24,14 +24,14 @@ class OccAgent(PFAgent):
 		for x in range(0,(self.worldHalfSize*2)-1):
 			col = []
 			for y in range(0,(self.worldHalfSize*2)-1):
-				col.append(BEGINNING_OCCUPIED_ESTIMATE)
+				col.append(self.BEGINNING_OCCUPIED_ESTIMATE)
 			self.probabilities.append(col)
 
 		# set sensor x,y
 		self._setSensorDimensions()
 
 	def _setSensorDimensions(self):
-		strList = self._getGrid(0)
+		strList = self.getGrid(0)
 		
 		dimensions = strList[1].split("x")
 		SENSOR_X = int(dimensions[0])
@@ -56,7 +56,7 @@ class OccAgent(PFAgent):
 		pointAt.append(int(strLine[0:commaPos]))
 		pointAt.append(int(strLine[commaPos+1:len(strLine)]))
 
-		return pointAt
+		return self.getAdjustedPoint(pointAt)
 
 	def getGrid(self, tankNum):
 		raw = self._getRawResponse("occgrid " + str(tankNum) + self.SERVER_DELIMITER)
