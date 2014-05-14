@@ -13,6 +13,7 @@ class OccAgent(PFAgent):
 	probabilities = []
 	probOfObstacles = .5
 
+	####### initialization functions
 	def __init__(self, ip, port):
 		Agent.__init__(self, ip, port)
 		self._initializePF()
@@ -35,7 +36,9 @@ class OccAgent(PFAgent):
 		dimensions = strList[1].split("x")
 		SENSOR_X = int(dimensions[0])
 		SENSOR_Y = int(dimensions[1])
-		
+
+	####### end initialization functions
+
 	def _countReportedObstacles(self,gridList):
 		numOnes = 0
 
@@ -55,7 +58,7 @@ class OccAgent(PFAgent):
 
 		return pointAt
 
-	def _getGrid(self, tankNum):
+	def getGrid(self, tankNum):
 		raw = self._getRawResponse("occgrid " + str(tankNum) + self.SERVER_DELIMITER)
 		raw = raw[len(self.LIST_START):-1*(len(self.LIST_END) + 1)]  # parse off 'begin\n' and 'end\n'
 		strList = raw.split(self.SERVER_DELIMITER)  # split strings by server delimiter
