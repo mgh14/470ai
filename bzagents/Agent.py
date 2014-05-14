@@ -104,6 +104,15 @@ class Agent(object):
 
 		return lineArrays
 
+	def _getRawResponse(self, queryCommand):
+		#print "query: " + query
+		self.socket.write(queryCommand + self.SERVER_DELIMITER)
+		response = self.socket.read_until(self.SERVER_DELIMITER).rstrip();
+		#print "ResponseL1: " + response
+
+		stringList = self.socket.read_until(self.LIST_END)
+		return stringList
+
 	def printList(self,listToPrint):
 		print "List:"
 		for current in listToPrint:
