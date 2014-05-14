@@ -196,6 +196,18 @@ class Agent(object):
 
 		return rawAngle
 
+	def _translateComponentCoord(self,cCoord):
+		if(cCoord > 0):
+			cCoord += self.worldHalfSize
+		else:
+			cCoord = self.worldHalfSize + cCoord
+
+		return cCoord
+
+	def getAdjustedPoint(self,point):
+		return [self._translateComponentCoord(point[0]), self._translateComponentCoord(point[1])]
+			
+
 	def play(self):		# driver function for beginning AI simulation
 		print "no implemented play method: tanks will just sit."
 
