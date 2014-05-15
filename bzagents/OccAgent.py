@@ -137,6 +137,8 @@ class OccAgent(PFAgent):
 		outfile = open(filename,'w')
 		print >>outfile, world
 
+	
+
 	def updateProbabilities(self, tankNum):
 		gridList = self._getGrid(tankNum)
 		#print str(gridList)		
@@ -149,7 +151,7 @@ class OccAgent(PFAgent):
 		for i in range( 2, len(gridList)  ):
 			for j in range( 0, len(gridList[i]) ):
 				x = beginningPoint[0] + (i-2)
-				y = beginningPoint[1] + j
+				y = beginningPoint[1] + j - 1
 				#print str(gridList[0])
 				#print str(beginningPoint)
 				#print str(x) + " " + str(y)
@@ -157,9 +159,14 @@ class OccAgent(PFAgent):
 				#maybe add checks if x and y are outside world dimensions
 				
 				#If probabilities are above or below a threshhold of probability assume it's correct
-				if self.probabilities[x][y] >= self.CONFIDENT_OF_OBSTACLE:
+				try:
+					prior = self.probabilities[x][y]
+				except IndexError:
+					break
+
+				if prior >= self.CONFIDENT_OF_OBSTACLE:
 					self.probabilities[x][y] = self.SPACE_OCCUPIED_CHAR
-				elif self.probabilities[x][y] <= self.CONFIDENT_OF_NO_OBSTACLE:
+				elif prior <= self.CONFIDENT_OF_NO_OBSTACLE:
 					#print "B"
 					self.probabilities[x][y] = self.SPACE_NOT_OCCUPIED_CHAR
 				else:
