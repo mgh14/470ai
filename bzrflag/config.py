@@ -170,7 +170,7 @@ class Config:
         g = optparse.OptionGroup(p, 'Team Defaults')
         p.add_option_group(g)
         g.add_option('--default-tanks',
-                dest='default_tanks',type='int',default=10,
+                dest='default_tanks',type='int',default=2,
                 help='specify the default number of tanks')
 
         ## random sensor noise
