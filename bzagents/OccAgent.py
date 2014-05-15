@@ -6,10 +6,10 @@ class OccAgent(PFAgent):
 	SENSOR_Y_DIM = Agent.NOT_SET
 	GRID_AT_STR = "at"
 	GRID_SIZE_STR = "size"
-	BEGINNING_OCCUPIED_ESTIMATE = .1
+	BEGINNING_OCCUPIED_ESTIMATE = .10
 	REPORTED_OBSTACLE_CHAR = "1"
-	CONFIDENT_OF_OBSTACLE = .95
-	CONFIDENT_OF_NO_OBSTACLE = (1-CONFIDENT_OF_OBSTACLE)
+	CONFIDENT_OF_OBSTACLE = .80
+	CONFIDENT_OF_NO_OBSTACLE = .00001
 	SPACE_OCCUPIED_CHAR = 1
 	SPACE_NOT_OCCUPIED_CHAR = 0
 	UNKNOWN_CHAR = "."
@@ -62,37 +62,46 @@ class OccAgent(PFAgent):
 		raw = raw[len(self.LIST_START):-1*(len(self.LIST_END) + 1)]  # parse off 'begin\n' and 'end\n'
 		strList = raw.split(self.SERVER_DELIMITER)  # split strings by server delimiter
 
-		rotatedList = []
-		#rotatedList.append(strList[0])
-		#rotatedList.append(strList[1])
-		#for x in range(0,len(strList)-2):
-		#	rotatedList.append(strList[len(strList)-1-x])
-		rotatedList = strList
 		# strip 'at' from point (bottom-left corner)
-		rotatedList[0] = rotatedList[0][len(self.GRID_AT_STR):len(rotatedList[0])].strip()
-		#strList[0] = strList[0][len(self.GRID_AT_STR):len(strList[0])].strip()
-		
+		atStr = strList[0][len(self.GRID_AT_STR):len(strList[0])].strip()		
+
 		# strip 'size' from size
-		rotatedList[1] = rotatedList[1][len(self.GRID_SIZE_STR):len(rotatedList[1])].strip()
-		#strList[1] = strList[1][len(self.GRID_SIZE_STR):len(strList[1])].strip()
+		sizeStr = strList[1][len(self.GRID_SIZE_STR):len(strList[1])].strip()
+		
+		newList = [atStr,sizeStr]
 
-		#for x in range(2,len(strList)):
-		#	strList[x] = strList[x][::-1]
-
-		return rotatedList
-		#return strList
+		lengthOfRow = len(strList[2])	# first row of samples in the array
+		for y in range(0,lengthOfRow):
+			line = ""
+			for x in range(2,len(strList)):
+				line += strList[x][lengthOfRow-1-y]
+	
+			newList.append(line)
+	
+		return newList
 
 	def printProbsToFile(self, filename):
 		world = ""
 		for x in range(0,self.worldHalfSize*2):
 			for y in range(0,self.worldHalfSize*2):
-				world += "{:10.2f}".format(self.probabilities[x][y]) + " "
+				world += '%.2f' % self.probabilities[x][y] + " "
+
 			world += "\n"
 
 		outfile = open(filename,'w')
 		print >>outfile, world
-	#def _testAdjoiningPoint(x,y):
-		
+
+	def _testAdjoiningPoint(self,x,y):
+		try:
+			mine = round(self.probabilities[x][y])
+			if(mine < .01):
+				return 0
+			elif(mine >= 1.000):
+				return 1
+
+			#return int(self.probabilities[x][y])
+		except IndexError:
+			return 0
 
 	def printMapToFile(self, filename):
 		world = ""
@@ -101,23 +110,25 @@ class OccAgent(PFAgent):
 				charToAdd = ""
 				if(self.probabilities[x][y] >= self.CONFIDENT_OF_OBSTACLE):
 					charToAdd += str(self.SPACE_OCCUPIED_CHAR)
+
+					# count 0's around this pixel		
+					total = 0
+					total += self._testAdjoiningPoint(x-1,y+1)
+					total += self._testAdjoiningPoint(x,y+1)
+					total += self._testAdjoiningPoint(x+1,y+1)
+					total += self._testAdjoiningPoint(x-1,y)
+					total += self._testAdjoiningPoint(x+1,y)
+					total += self._testAdjoiningPoint(x-1,y-1)
+					total += self._testAdjoiningPoint(x,y-1)
+					total += self._testAdjoiningPoint(x+1,y-1)
+					if(total < 5):
+						charToAdd = str(self.SPACE_NOT_OCCUPIED_CHAR)
+
 				elif(self.probabilities[x][y] <= self.CONFIDENT_OF_NO_OBSTACLE):
 					charToAdd += str(self.SPACE_NOT_OCCUPIED_CHAR)
-				else:
-					charToAdd += self.UNKNOWN_CHAR
 
-				# count 1's around this pixel		
-				#total = 0
-				#total += int(self.probabilities[x-1][y+1])
-				#total += int(self.probabilities[x][y+1])
-				#total += int(self.probabilities[x+1][y+1])
-				#total += int(self.probabilities[x-1][y])
-				#total += int(self.probabilities[x+1][y])
-				#total += int(self.probabilities[x-1][y-1])
-				#total += int(self.probabilities[x][y-1])
-				#total += int(self.probabilities[x+1][y-1])
-				#if(total > 4):
-				#	charToAdd = CONFIDENT_OF_OBSTACLE
+				else:
+					charToAdd += str(self.UNKNOWN_CHAR)
 				
 				world += charToAdd
 				
