@@ -1,4 +1,5 @@
 from PFAgent import *
+from grid_filter_gl import *
 
 class OccAgent(PFAgent):
 	# member constants
@@ -6,10 +7,10 @@ class OccAgent(PFAgent):
 	SENSOR_Y_DIM = Agent.NOT_SET
 	GRID_AT_STR = "at"
 	GRID_SIZE_STR = "size"
-	BEGINNING_OCCUPIED_ESTIMATE = .10
+	BEGINNING_OCCUPIED_ESTIMATE = .20
 	REPORTED_OBSTACLE_CHAR = "1"
-	CONFIDENT_OF_OBSTACLE = .80
-	CONFIDENT_OF_NO_OBSTACLE = .00001
+	CONFIDENT_OF_OBSTACLE = .999995
+	CONFIDENT_OF_NO_OBSTACLE = .000001
 	SPACE_OCCUPIED_CHAR = 1
 	SPACE_NOT_OCCUPIED_CHAR = 0
 	UNKNOWN_CHAR = "."
@@ -30,12 +31,9 @@ class OccAgent(PFAgent):
 
 	def _initializeOcc(self):
 		# initialize the probabilities 
-		for x in range(0,self.worldHalfSize*2):
-			col = []
-			for y in range(0,self.worldHalfSize*2):
-				col.append(self.BEGINNING_OCCUPIED_ESTIMATE)
-			self.probabilities.append(col)
-
+		self.probabilities = self.BEGINNING_OCCUPIED_ESTIMATE * ones((self.worldHalfSize * 2, self.worldHalfSize * 2))
+		init_window(self.worldHalfSize * 2, self.worldHalfSize * 2)
+		
 		# set sensor x,y
 		self._setSensorDimensions()
 
@@ -154,7 +152,11 @@ class OccAgent(PFAgent):
 				#print str(beginningPoint)
 				#print str(x) + " " + str(y)
 				
-				#maybe add checks if x and y are outside world dimensions
+				#checks if x and y are outside world dimensions
+				if x >= self.worldHalfSize * 2 or x < 0:
+					continue
+				if y >= self.worldHalfSize * 2 or y < 0:
+					continue
 				
 				#If probabilities are above or below a threshhold of probability assume it's correct
 				if self.probabilities[x][y] >= self.CONFIDENT_OF_OBSTACLE:
@@ -184,3 +186,7 @@ class OccAgent(PFAgent):
 			probUnOcc = self.TRUE_NEGATIVE * (1 - self.probabilities[x][y])
 
 		return probOcc / (probOcc + probUnOcc)
+		
+	def drawGrid(self):
+		update_grid(self.probabilities)
+		draw_grid()
