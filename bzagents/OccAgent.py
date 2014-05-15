@@ -11,7 +11,7 @@ class OccAgent(PFAgent):
 	BEGINNING_OCCUPIED_ESTIMATE = .05
 	REPORTED_OBSTACLE_CHAR = "1"
 	CONFIDENT_OF_OBSTACLE = .90
-	CONFIDENT_OF_NO_OBSTACLE = .000001
+	CONFIDENT_OF_NO_OBSTACLE = .01
 	SPACE_OCCUPIED_CHAR = 1
 	SPACE_NOT_OCCUPIED_CHAR = 0
 	UNKNOWN_CHAR = "."
@@ -132,16 +132,16 @@ class OccAgent(PFAgent):
 
 					# count 0's around this pixel		
 					total = 0
-					total += self._testAdjoiningPoint(x-1,y+1)
-					total += self._testAdjoiningPoint(x,y+1)
-					total += self._testAdjoiningPoint(x+1,y+1)
-					total += self._testAdjoiningPoint(x-1,y)
-					total += self._testAdjoiningPoint(x+1,y)
-					total += self._testAdjoiningPoint(x-1,y-1)
-					total += self._testAdjoiningPoint(x,y-1)
-					total += self._testAdjoiningPoint(x+1,y-1)
-					if(total < 5):
-						charToAdd = str(self.SPACE_NOT_OCCUPIED_CHAR)
+					#total += self._testAdjoiningPoint(x-1,y+1)
+					#total += self._testAdjoiningPoint(x,y+1)
+					#total += self._testAdjoiningPoint(x+1,y+1)
+					#total += self._testAdjoiningPoint(x-1,y)
+					#total += self._testAdjoiningPoint(x+1,y)
+					#total += self._testAdjoiningPoint(x-1,y-1)
+					#total += self._testAdjoiningPoint(x,y-1)
+					#total += self._testAdjoiningPoint(x+1,y-1)
+					#if(total < 5):
+					#	charToAdd += str(self.SPACE_NOT_OCCUPIED_CHAR)
 
 				elif(probability <= self.CONFIDENT_OF_NO_OBSTACLE):
 					charToAdd += str(self.SPACE_NOT_OCCUPIED_CHAR)
@@ -155,6 +155,11 @@ class OccAgent(PFAgent):
 
 		outfile = open(filename,'w')
 		print >>outfile, world
+
+	def testSpot(self,tankNum):
+		for x in range(0,20):
+			self.updateProbabilities(tankNum)
+			self.drawGrid()
 
 	def _checkNeighbors(self,x,y):
 		total = 0
@@ -177,8 +182,8 @@ class OccAgent(PFAgent):
 		# iterate through gridList
 		for i in range( 2, len(gridList)  ):
 			for j in range( 0, len(gridList[i]) ):
-				x = beginningPoint[0] + (i-2)
-				y = beginningPoint[1] + j
+				x = beginningPoint[0] + j
+				y = beginningPoint[1] + (i-2)
 				
 				#checks if x and y are outside world dimensions
 				if x >= self.worldHalfSize * 2 or x < 0:
