@@ -196,21 +196,14 @@ class OccAgent(PFAgent):
 				try:
 					prior = self.probabilities[x][y]
 				except IndexError:
-					break
+					continue
 				if prior >= self.CONFIDENT_OF_OBSTACLE:
 					self.probabilities[x][y] = self.SPACE_OCCUPIED_CHAR
 				elif prior <= self.CONFIDENT_OF_NO_OBSTACLE:
 					self.probabilities[x][y] = self.SPACE_NOT_OCCUPIED_CHAR
 				else:
 					self.probabilities[x][y] = self.updateProbability( x, y, gridList[i][j] )
-			#print self.probabilities[504][504]
-			#sys.exit(0)
-#		for i in range( 2, len(gridList)  ):
-#			for j in range( 0, len(gridList[i]) ):
-#				x = beginningPoint[0] + (i-2)
-#				y = beginningPoint[1] + j - 1
-				
-					
+									
 	def updateProbability(self, x, y, observed_value):
 		probOcc = self.NOT_SET
 		probUnOcc = self.NOT_SET
