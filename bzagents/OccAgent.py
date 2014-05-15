@@ -118,12 +118,15 @@ class OccAgent(PFAgent):
 
 	def printMapToFile(self, filename):
 		world = ""
-		for x in range(0,self.worldHalfSize*2):
-			for y in range(0,self.worldHalfSize*2):
+
+		# start with y so we go across the screen instead of up and down
+		for y in range(0,self.worldHalfSize*2):
+			yCoord = (self.worldHalfSize*2)-1-y
+			for x in range(0,self.worldHalfSize*2):
 				charToAdd = ""
 		
 				# start from top-left of screen: x = 0, y = 800
-				probability = self.probabilities[x][(self.worldHalfSize*2)-1-y]
+				probability = self.probabilities[x][yCoord]
 				if(probability >= self.CONFIDENT_OF_OBSTACLE):
 					charToAdd += str(self.SPACE_OCCUPIED_CHAR)
 
@@ -195,8 +198,8 @@ class OccAgent(PFAgent):
 					self.probabilities[x][y] = self.SPACE_NOT_OCCUPIED_CHAR
 				else:
 					self.probabilities[x][y] = self.updateProbability( x, y, gridList[i][j] )
-			print self.probabilities[504][504]
-			sys.exit(0)
+			#print self.probabilities[504][504]
+			#sys.exit(0)
 #		for i in range( 2, len(gridList)  ):
 #			for j in range( 0, len(gridList[i]) ):
 #				x = beginningPoint[0] + (i-2)
