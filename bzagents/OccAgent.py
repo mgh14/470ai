@@ -1,5 +1,6 @@
 from PFAgent import *
 from grid_filter_gl import *
+from OpenGL import *
 
 class OccAgent(PFAgent):
 	# member constants
@@ -7,9 +8,9 @@ class OccAgent(PFAgent):
 	SENSOR_Y_DIM = Agent.NOT_SET
 	GRID_AT_STR = "at"
 	GRID_SIZE_STR = "size"
-	BEGINNING_OCCUPIED_ESTIMATE = .20
+	BEGINNING_OCCUPIED_ESTIMATE = .05
 	REPORTED_OBSTACLE_CHAR = "1"
-	CONFIDENT_OF_OBSTACLE = .999995
+	CONFIDENT_OF_OBSTACLE = .90
 	CONFIDENT_OF_NO_OBSTACLE = .000001
 	SPACE_OCCUPIED_CHAR = 1
 	SPACE_NOT_OCCUPIED_CHAR = 0
@@ -40,7 +41,7 @@ class OccAgent(PFAgent):
 	def _setSensorDimensions(self):
 		strList = self._getGrid(0)
 		
-		dimensions = strList[1].split("x")
+		dimensions = strList[1]
 		self.SENSOR_X_DIM = int(dimensions[0])
 		self.SENSOR_Y_DIM = int(dimensions[1])
 
@@ -55,19 +56,29 @@ class OccAgent(PFAgent):
 
 		return self.getAdjustedPoint(pointAt)
 
+	def _getSizeFromString(self,strLine):
+		xPos = strLine.index("x")
+
+		sizes = []
+		sizes.append(int(strLine[0:xPos]))
+		sizes.append(int(strLine[xPos+1:len(strLine)]))
+
+		return sizes
+
 	def _getGrid(self, tankNum):
 		raw = self._getRawResponse("occgrid " + str(tankNum) + self.SERVER_DELIMITER)
 		raw = raw[len(self.LIST_START):-1*(len(self.LIST_END) + 1)]  # parse off 'begin\n' and 'end\n'
 		strList = raw.split(self.SERVER_DELIMITER)  # split strings by server delimiter
 
 		# strip 'at' from point (bottom-left corner)
-		atStr = strList[0][len(self.GRID_AT_STR):len(strList[0])].strip()		
-
+		atStr = strList[0][len(self.GRID_AT_STR):len(strList[0])].strip()
+		strList[0] = self._getPointFromString(atStr)  # translate to x,y coordinates
+		
 		# strip 'size' from size
 		sizeStr = strList[1][len(self.GRID_SIZE_STR):len(strList[1])].strip()
+		strList[1] = self._getSizeFromString(sizeStr)
 		
-		newList = [atStr,sizeStr]
-
+		newList = [strList[0],strList[1]]
 		lengthOfRow = len(strList[2])	# first row of samples in the array
 		for y in range(0,lengthOfRow):
 			line = ""
@@ -75,8 +86,12 @@ class OccAgent(PFAgent):
 				line += strList[x][lengthOfRow-1-y]
 	
 			newList.append(line)
-	
-		return newList
+
+		newList2 = [newList[0],newList[1]]
+		for x in range(0,len(newList)-2):
+			newList2.append(newList[len(newList)-1-x])
+		
+		return newList2
 
 	def printProbsToFile(self, filename):
 		world = ""
@@ -106,7 +121,10 @@ class OccAgent(PFAgent):
 		for x in range(0,self.worldHalfSize*2):
 			for y in range(0,self.worldHalfSize*2):
 				charToAdd = ""
-				if(self.probabilities[x][y] >= self.CONFIDENT_OF_OBSTACLE):
+		
+				# start from top-left of screen: x = 0, y = 800
+				probability = self.probabilities[x][(self.worldHalfSize*2)-1-y]
+				if(probability >= self.CONFIDENT_OF_OBSTACLE):
 					charToAdd += str(self.SPACE_OCCUPIED_CHAR)
 
 					# count 0's around this pixel		
@@ -122,7 +140,7 @@ class OccAgent(PFAgent):
 					if(total < 5):
 						charToAdd = str(self.SPACE_NOT_OCCUPIED_CHAR)
 
-				elif(self.probabilities[x][y] <= self.CONFIDENT_OF_NO_OBSTACLE):
+				elif(probability <= self.CONFIDENT_OF_NO_OBSTACLE):
 					charToAdd += str(self.SPACE_NOT_OCCUPIED_CHAR)
 
 				else:
@@ -135,24 +153,29 @@ class OccAgent(PFAgent):
 		outfile = open(filename,'w')
 		print >>outfile, world
 
+	def _checkNeighbors(self,x,y):
+		total = 0
+		total += self._testAdjoiningPoint(x-1,y+1)
+		total += self._testAdjoiningPoint(x,y+1)
+		total += self._testAdjoiningPoint(x+1,y+1)
+		total += self._testAdjoiningPoint(x-1,y)
+		total += self._testAdjoiningPoint(x+1,y)
+		total += self._testAdjoiningPoint(x-1,y-1)
+		total += self._testAdjoiningPoint(x,y-1)
+		total += self._testAdjoiningPoint(x+1,y-1)
+		#if(total < 5):
+		#	charToAdd = str(self.SPACE_NOT_OCCUPIED_CHAR)
 	
 
 	def updateProbabilities(self, tankNum):
 		gridList = self._getGrid(tankNum)
-		#print str(gridList)		
-		#print str(len(gridList))
-		#print str(gridList[0]) + " " + str(gridList[1])
-		#print str(gridList[101])
-		beginningPoint = self._getPointFromString(gridList[0]) # bottom-left corner
+		beginningPoint = gridList[0] # bottom-left corner
 
 		# iterate through gridList
 		for i in range( 2, len(gridList)  ):
 			for j in range( 0, len(gridList[i]) ):
 				x = beginningPoint[0] + (i-2)
-				y = beginningPoint[1] + j - 1
-				#print str(gridList[0])
-				#print str(beginningPoint)
-				#print str(x) + " " + str(y)
+				y = beginningPoint[1] + j
 				
 				#checks if x and y are outside world dimensions
 				if x >= self.worldHalfSize * 2 or x < 0:
@@ -160,35 +183,39 @@ class OccAgent(PFAgent):
 				if y >= self.worldHalfSize * 2 or y < 0:
 					continue
 				
-				#If probabilities are above or below a threshhold of probability assume it's correct
+				# If probabilities are above or below a threshold 
+				# of probability assume it's correct
 				try:
 					prior = self.probabilities[x][y]
 				except IndexError:
 					break
-
 				if prior >= self.CONFIDENT_OF_OBSTACLE:
 					self.probabilities[x][y] = self.SPACE_OCCUPIED_CHAR
 				elif prior <= self.CONFIDENT_OF_NO_OBSTACLE:
-					#print "B"
 					self.probabilities[x][y] = self.SPACE_NOT_OCCUPIED_CHAR
 				else:
-					#print "c"
 					self.probabilities[x][y] = self.updateProbability( x, y, gridList[i][j] )
-				#sys.exit(0)
-
-		#print "help: " + str(self.probabilities[beginningPoint[0]][beginningPoint[1]])
+			print self.probabilities[504][504]
+			sys.exit(0)
+#		for i in range( 2, len(gridList)  ):
+#			for j in range( 0, len(gridList[i]) ):
+#				x = beginningPoint[0] + (i-2)
+#				y = beginningPoint[1] + j - 1
+				
 					
 	def updateProbability(self, x, y, observed_value):
 		probOcc = self.NOT_SET
 		probUnOcc = self.NOT_SET
 		if observed_value == "1":
-			#probability that this is an actual occupied space
-			#our probabilities array holds previous probability that it is occupied.
+			# probability that this is an actual occupied space
+			# our probabilities array holds previous probability that it is occupied.
 			probOcc = self.TRUE_POSITIVE * self.probabilities[x][y]
+			
 			# one minus our stored probability is the probability it is unoccupied
 			probUnOcc = self.FALSE_POSITIVE * (1 - self.probabilities[x][y])
+		
 		elif observed_value == "0":
-			#same as above but using our FalseNegative and TrueNegative values.
+			# same as above but using our FalseNegative and TrueNegative values.
 			probOcc = self.FALSE_NEGATIVE * self.probabilities[x][y]
 			probUnOcc = self.TRUE_NEGATIVE * (1 - self.probabilities[x][y])
 
