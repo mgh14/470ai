@@ -7,6 +7,7 @@ class OccAgent(PFAgent):
 	SENSOR_Y_DIM = Agent.NOT_SET
 	GRID_AT_STR = "at"
 	GRID_SIZE_STR = "size"
+<<<<<<< HEAD
 	BEGINNING_OCCUPIED_ESTIMATE = .01
 	REPORTED_OBSTACLE_CHAR = "1"
 	CONFIDENT_OF_OBSTACLE = 1
@@ -15,6 +16,16 @@ class OccAgent(PFAgent):
 	# member variables
 	probabilities = []
 	probOfOnes = .1
+=======
+	BEGINNING_OCCUPIED_ESTIMATE = .2
+	TRUE_POSITIVE = .97
+	FALSE_POSITIVE = .03
+	TRUE_NEGATIVE = .9
+	FALSE_NEGATIVE = .1
+
+	# member variables
+	probabilities = []
+>>>>>>> 09ebe788d79d2c91ff47f014aabf2f75af86fc60
 
 	####### initialization functions
 	def __init__(self, ip, port):
@@ -61,7 +72,7 @@ class OccAgent(PFAgent):
 
 		return self.getAdjustedPoint(pointAt)
 
-	def getGrid(self, tankNum):
+	def _getGrid(self, tankNum):
 		raw = self._getRawResponse("occgrid " + str(tankNum) + self.SERVER_DELIMITER)
 		raw = raw[len(self.LIST_START):-1*(len(self.LIST_END) + 1)]  # parse off 'begin\n' and 'end\n'
 		strList = raw.split(self.SERVER_DELIMITER)  # split strings by server delimiter
@@ -88,7 +99,7 @@ class OccAgent(PFAgent):
 		gridList = self.getGrid(tankNum)
 		beginningPoint = self._getPointFromString(gridList[0]) # bottom-left corner
 		
-		numOnes = 0
+		'''numOnes = 0
 		for x in range(2,2+self.SENSOR_X_DIM):
 			line = gridList[x]
 			#numOnes += line.count(self.REPORTED_OBSTACLE_CHAR)  # count reported 'occupied' samples
@@ -109,4 +120,36 @@ class OccAgent(PFAgent):
 					# represents P(o_i,j = hit | s_i,j = occupied) (true-positive) 
 					a = 2
 
-				self.probabilities[x-2][y] = combinedProbs*believedSOccVal
+				self.probabilities[x-2][y] = combinedProbs*believedSOccVal'''
+
+		# iterate through gridList  (remember that the grid needs to be rotated counter-clockwise)
+		for i in range( 0, len(gridList)  ):
+			for j in range( 0, len(gridList[i]) - 1):
+				x = beginningPoint[0] + i
+				y = beginningPoint[1] + j
+				
+				#maybe add checks if x and y are outside world dimensions
+				
+				#If probabilities are above or below a threshhold of probability assume it's correct
+				if self.probabilities[x][y] >= 0.95:
+					self.probabilities[x][y] = 1
+				elif self.probabilities[x][y] <= 0.05:
+					self.probabilities[x][y] = 0
+				else:
+					self.probabilities[x][y] = self.updateProbability( x, y, gridList[x][y] )
+					
+	def updateProbability(self, x, y, observed_value):
+		probOcc = self.NOT_SET
+		probUnOcc = self.NOT_SET
+		if observed_value == 1:
+			#probability that this is an actual occupied space
+			#our probabilities array holds previous probability that it is occupied.
+			probOcc = self.TRUE_POSITIVE * self.probabilities[x][y]
+			# one minus our stored probability is the probability it is unoccupied
+			probUnOcc = self.FALSE_POSITIVE * (1 - self.probabilities[x][y])
+		elif observed_value == 0:
+			#same as above but using our FalseNegative and TrueNegative values.
+			probOcc = self.FALSE_NEGATIVE * self.probabilities[x][y]
+			probUnOcc = self.TRUE_NEGATIVE * (1 - self.probabilities[x][y])
+		
+		return probOcc / (probOcc + probUnOcc)
