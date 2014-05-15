@@ -191,8 +191,8 @@ class OccAgent(PFAgent):
 				if y >= self.worldHalfSize * 2 or y < 0:
 					continue
 				
-				# If probabilities are above or below a threshold 
-				# of probability assume it's correct
+				# If probabilities are above or below a certain  
+				# threshold, assume it's correct
 				try:
 					prior = self.probabilities[x][y]
 				except IndexError:
@@ -207,6 +207,7 @@ class OccAgent(PFAgent):
 	def updateProbability(self, x, y, observed_value):
 		probOcc = self.NOT_SET
 		probUnOcc = self.NOT_SET
+
 		if observed_value == "1":
 			# probability that this is an actual occupied space
 			# our probabilities array holds previous probability that it is occupied.
