@@ -130,19 +130,6 @@ class OccAgent(PFAgent):
 				if(probability >= self.CONFIDENT_OF_OBSTACLE):
 					charToAdd += str(self.SPACE_OCCUPIED_CHAR)
 
-					# count 0's around this pixel		
-					total = 0
-					#total += self._testAdjoiningPoint(x-1,y+1)
-					#total += self._testAdjoiningPoint(x,y+1)
-					#total += self._testAdjoiningPoint(x+1,y+1)
-					#total += self._testAdjoiningPoint(x-1,y)
-					#total += self._testAdjoiningPoint(x+1,y)
-					#total += self._testAdjoiningPoint(x-1,y-1)
-					#total += self._testAdjoiningPoint(x,y-1)
-					#total += self._testAdjoiningPoint(x+1,y-1)
-					#if(total < 5):
-					#	charToAdd += str(self.SPACE_NOT_OCCUPIED_CHAR)
-
 				elif(probability <= self.CONFIDENT_OF_NO_OBSTACLE):
 					charToAdd += str(self.SPACE_NOT_OCCUPIED_CHAR)
 
@@ -156,24 +143,41 @@ class OccAgent(PFAgent):
 		outfile = open(filename,'w')
 		print >>outfile, world
 
-	def testSpot(self,tankNum):
+	def useSensors(self,tankNum):
 		for x in range(0,20):
 			self.updateProbabilities(tankNum)
 			self.drawGrid()
 
 	def _checkNeighbors(self,x,y):
 		total = 0
-		total += self._testAdjoiningPoint(x-1,y+1)
-		total += self._testAdjoiningPoint(x,y+1)
-		total += self._testAdjoiningPoint(x+1,y+1)
-		total += self._testAdjoiningPoint(x-1,y)
-		total += self._testAdjoiningPoint(x+1,y)
-		total += self._testAdjoiningPoint(x-1,y-1)
-		total += self._testAdjoiningPoint(x,y-1)
-		total += self._testAdjoiningPoint(x+1,y-1)
-		#if(total < 5):
-		#	charToAdd = str(self.SPACE_NOT_OCCUPIED_CHAR)
-	
+		topLeft = self.probabilities[x-1,y+1]
+		topMiddle = self.probabilities[x,y+1]
+		topRight = self.probabilities[x+1,y+1]
+		middleLeft = self.probabilities[x-1,y]
+		middleRight = self.probabilities[x+1,y]
+		bottomLeft = self.probabilities[x-1,y-1]
+		bottomMiddle = self.probabilities[x,y-1]
+		bottomRight = self.probabilities[x+1,y-1]
+
+		arr = [topLeft,topMiddle,topRight,middleLeft,middleRight,bottomLeft,bottomMiddle,bottomRight]
+
+		# count 1's and 0's (not probabilities in between)
+		onesCounter = 0
+		zerosCounter = 0
+		for x in range(0,len(arr)):
+			if(arr[x] >= self.CONFIDENT_OF_OBSTACLE):
+				onesCounter += 1
+			if(arr[x] < self.CONFIDENT_OF_NO_OBSTACLE):
+				zerosCounter += 1
+
+		if(onesCounter > 4):
+			return 1
+		if(zerosCounter > 4):
+			return 0
+
+		# neither ones nor zeros are a majority--return -1 to
+		# signify no majority
+		return -1
 
 	def updateProbabilities(self, tankNum):
 		gridList = self._getGrid(tankNum)
@@ -197,6 +201,15 @@ class OccAgent(PFAgent):
 					prior = self.probabilities[x][y]
 				except IndexError:
 					continue
+
+				# if 5+ neighboring values are known, make this
+				# pixel match the neighboring values
+				checkNeighborsVal = self._checkNeighbors(x,y)
+				if(checkNeighborsVal == 1):
+					prior = 1
+				if(checkNeighborsVal == 0):
+					prior = 0
+
 				if prior >= self.CONFIDENT_OF_OBSTACLE:
 					self.probabilities[x][y] = self.SPACE_OCCUPIED_CHAR
 				elif prior <= self.CONFIDENT_OF_NO_OBSTACLE:
