@@ -7,17 +7,10 @@ class OccAgent(PFAgent):
 	SENSOR_Y_DIM = Agent.NOT_SET
 	GRID_AT_STR = "at"
 	GRID_SIZE_STR = "size"
-<<<<<<< HEAD
 	BEGINNING_OCCUPIED_ESTIMATE = .01
 	REPORTED_OBSTACLE_CHAR = "1"
 	CONFIDENT_OF_OBSTACLE = 1
 	CONFIDENT_OF_NO_OBSTACLE = -1
-
-	# member variables
-	probabilities = []
-	probOfOnes = .1
-=======
-	BEGINNING_OCCUPIED_ESTIMATE = .2
 	TRUE_POSITIVE = .97
 	FALSE_POSITIVE = .03
 	TRUE_NEGATIVE = .9
@@ -25,7 +18,7 @@ class OccAgent(PFAgent):
 
 	# member variables
 	probabilities = []
->>>>>>> 09ebe788d79d2c91ff47f014aabf2f75af86fc60
+
 
 	####### initialization functions
 	def __init__(self, ip, port):
