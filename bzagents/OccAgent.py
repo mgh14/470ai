@@ -1,6 +1,6 @@
 from PFAgent import *
 from grid_filter_gl import *
-from OpenGL import *
+from PIL import Image
 
 class OccAgent(PFAgent):
 	# member constants
@@ -33,7 +33,6 @@ class OccAgent(PFAgent):
 	def _initializeOcc(self):
 		# initialize the probabilities 
 		self.probabilities = self.BEGINNING_OCCUPIED_ESTIMATE * ones((self.worldHalfSize * 2, self.worldHalfSize * 2))
-		init_window(self.worldHalfSize * 2, self.worldHalfSize * 2)
 		
 		# set sensor x,y
 		self._setSensorDimensions()
@@ -104,17 +103,29 @@ class OccAgent(PFAgent):
 		outfile = open(filename,'w')
 		print >>outfile, world
 
-	def _testAdjoiningPoint(self,x,y):
-		try:
-			mine = round(self.probabilities[x][y])
-			if(mine < .01):
-				return 0
-			elif(mine >= 1.000):
-				return 1
+	def printMapToGrayscale(self, filename):
+		imgArray = []
+		for y in range(0,self.worldHalfSize*2):
+			yCoord = (self.worldHalfSize*2)-1-y
+			for x in range(0,self.worldHalfSize*2):
+				intToAdd = 0
+		
+				# start from top-left of screen: x = 0, y = 800
+				probability = self.probabilities[x][yCoord]
+				if(probability >= self.CONFIDENT_OF_OBSTACLE):
+					intToAdd = (self.SPACE_OCCUPIED_CHAR*255)
 
-			#return int(self.probabilities[x][y])
-		except IndexError:
-			return 0
+				elif(probability <= self.CONFIDENT_OF_NO_OBSTACLE):
+					intToAdd = 0
+
+				else:
+					intToAdd = probability*255
+				
+				imgArray.append(intToAdd)
+
+		im = Image.new('L',(800,800))
+		im.putdata(imgArray)
+		im.save(filename,"PNG")
 
 	def printMapToFile(self, filename):
 		world = ""
@@ -143,21 +154,59 @@ class OccAgent(PFAgent):
 		outfile = open(filename,'w')
 		print >>outfile, world
 
-	def useSensors(self,tankNum):
+	def senseTerrain(self,tankNum):
 		for x in range(0,20):
 			self.updateProbabilities(tankNum)
-			self.drawGrid()
 
-	def _checkNeighbors(self,x,y):
-		total = 0
-		topLeft = self.probabilities[x-1,y+1]
-		topMiddle = self.probabilities[x,y+1]
-		topRight = self.probabilities[x+1,y+1]
-		middleLeft = self.probabilities[x-1,y]
-		middleRight = self.probabilities[x+1,y]
-		bottomLeft = self.probabilities[x-1,y-1]
-		bottomMiddle = self.probabilities[x,y-1]
-		bottomRight = self.probabilities[x+1,y-1]
+	def _checkNeighbors(self,x,y):	
+		tolerance = .1
+		topLeft = tolerance
+		try:
+			topLeft = self.probabilities[x-1,y+1]
+		except IndexError:
+			pass
+	
+		topMiddle = tolerance
+		try:
+			topMiddle = self.probabilities[x,y+1]
+		except IndexError:
+			pass
+
+		topRight = tolerance
+		try:
+			topRight = self.probabilities[x+1,y+1]
+		except IndexError:
+			pass
+
+		middleLeft = tolerance
+		try:
+			middleLeft = self.probabilities[x-1,y]
+		except IndexError:
+			pass
+
+		middleRight = tolerance
+		try:
+			middleRight = self.probabilities[x+1,y]
+		except IndexError:
+			pass
+
+		bottomLeft = tolerance
+		try:
+			bottomLeft = self.probabilities[x-1,y-1]
+		except IndexError:
+			pass
+
+		bottomMiddle = tolerance
+		try:
+			bottomMiddle = self.probabilities[x,y-1]
+		except IndexError:
+			pass
+
+		bottomRight = tolerance
+		try:
+			bottomRight = self.probabilities[x+1,y-1]
+		except IndexError:
+			pass
 
 		arr = [topLeft,topMiddle,topRight,middleLeft,middleRight,bottomLeft,bottomMiddle,bottomRight]
 
@@ -195,8 +244,7 @@ class OccAgent(PFAgent):
 				if y >= self.worldHalfSize * 2 or y < 0:
 					continue
 				
-				# If probabilities are above or below a certain  
-				# threshold, assume it's correct
+				# get the prior probability value for this pixel
 				try:
 					prior = self.probabilities[x][y]
 				except IndexError:
@@ -210,6 +258,8 @@ class OccAgent(PFAgent):
 				if(checkNeighborsVal == 0):
 					prior = 0
 
+				# If probabilities are above or below a certain  
+				# threshold, assume it's correct
 				if prior >= self.CONFIDENT_OF_OBSTACLE:
 					self.probabilities[x][y] = self.SPACE_OCCUPIED_CHAR
 				elif prior <= self.CONFIDENT_OF_NO_OBSTACLE:
@@ -235,7 +285,3 @@ class OccAgent(PFAgent):
 			probUnOcc = self.TRUE_NEGATIVE * (1 - self.probabilities[x][y])
 
 		return probOcc / (probOcc + probUnOcc)
-		
-	def drawGrid(self):
-		update_grid(self.probabilities)
-		draw_grid()
