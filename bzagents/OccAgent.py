@@ -157,6 +157,7 @@ class OccAgent(PFAgent):
 	def senseTerrain(self,tankNum):
 		for x in range(0,20):
 			self.updateProbabilities(tankNum)
+		self.printMapToGrayscale("tankmap5.png")
 
 	def _checkNeighbors(self,x,y):	
 		tolerance = .1
@@ -228,6 +229,31 @@ class OccAgent(PFAgent):
 		# signify no majority
 		return -1
 
+	def randomWander(self):
+		currTime = time.time()
+		rotating = False
+		tolerance = 30
+		self.commandAgent("speed 0 1")
+		while 1:
+			self.commandAgent("shoot 0")
+			negative = False
+			self.senseTerrain(0)
+			if(time.time() - currTime > tolerance):
+				self.commandAgent("speed 0 0")
+				randomAngVel = random.random() 
+				if(randomAngVel < .5):
+					randomAngVel += .5
+				if(negative == True):
+					randomAngVel *= -1
+					negative = (not negative)
+
+				self.commandAgent("angvel 0 " + str(randomAngVel))
+				time.sleep(5)
+				self.commandAgent("angvel 0 0")
+				self.commandAgent("speed 0 1")
+				currTime = time.time()
+				
+	
 	def updateProbabilities(self, tankNum):
 		gridList = self._getGrid(tankNum)
 		beginningPoint = gridList[0] # bottom-left corner
