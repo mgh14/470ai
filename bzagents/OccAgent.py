@@ -1,6 +1,7 @@
 from PFAgent import *
 from grid_filter_gl import *
 from PIL import Image
+from random import randint
 
 class OccAgent(PFAgent):
 	# member constants
@@ -22,6 +23,9 @@ class OccAgent(PFAgent):
 	
 	# member variables
 	probabilities = []
+	openGlWindowInitialized = False
+	visitedNodes = []
+	currNodeToVisit = [(0,0)]
 
 
 	####### initialization functions
@@ -33,11 +37,16 @@ class OccAgent(PFAgent):
 	def _initializeOcc(self):
 		# initialize the probabilities 
 		self.probabilities = self.BEGINNING_OCCUPIED_ESTIMATE * ones((self.worldHalfSize * 2, self.worldHalfSize * 2))
+		#initialize visitedNodes
+		for i in range(0,15):
+			row = []
+			for j in range(0,15):
+				row.append(0)
+			self.visitedNodes.append(row)
 		
 		# set sensor x,y
 		self._setSensorDimensions()
 		
-		init_window(self.worldHalfSize * 2, self.worldHalfSize * 2)
 
 	def _setSensorDimensions(self):
 		strList = self._getGrid(0)
@@ -118,7 +127,7 @@ class OccAgent(PFAgent):
 					intToAdd = (self.SPACE_OCCUPIED_CHAR*255)
 
 				elif(probability <= self.CONFIDENT_OF_NO_OBSTACLE):
-					intToAdd = 0
+					intToAdd = 01
 
 				else:
 					intToAdd = probability*255
@@ -294,6 +303,12 @@ class OccAgent(PFAgent):
 					self.probabilities[x][y] = self.SPACE_NOT_OCCUPIED_CHAR
 				else:
 					self.probabilities[x][y] = self.updateProbability( x, y, gridList[i][j] )
+				
+				#update visited nodes
+				if x % 50 == 0 and y % 50 == 0:
+					self.visitedNodes[(x/50)-1][(y/50)-1] = 1
+					self.setNextUnvisitedNode()
+					
 									
 	def updateProbability(self, x, y, observed_value):
 		probOcc = self.NOT_SET
@@ -315,5 +330,78 @@ class OccAgent(PFAgent):
 		return probOcc / (probOcc + probUnOcc)
 		
 	def drawGrid(self):
+		if False == self.openGlWindowInitialized:
+			init_window(self.worldHalfSize * 2, self.worldHalfSize * 2)
+			self.openGlWindowInitialized = True
 		update_grid(self.probabilities)
 		draw_grid()
+		
+	def setNextUnvisitedNode(self):
+		for x in range(0, 14):
+			returnRandom = False
+			for y in range(14, 0,-1):
+				if self.visitedNodes[x][y] == 0:
+					if x*50 == self.currNodeToVisit[0][0] and y == self.currNodeToVisit[0][1]:
+						returnRandom = True
+						break
+					self.currNodeToVisit = [((x+1)*50-self.worldHalfSize,(y+1)*50-self.worldHalfSize)]
+					return self.currNodeToVisit
+			if returnRandom == True:
+				break
+		
+		x = random.randint(1,15)
+		y = random.randint(1,15)
+		self.currNodeToVisit = [(x*50-self.worldHalfSize,y*50-self.worldHalfSize)]
+		return self.currNodeToVisit
+		
+		
+	def explore(self):
+		captureTank = 0
+		tanksInfo = self._query("mytanks")
+
+		updateNodeTolerance = 20
+		visitNodeTime = time.time()
+		tanksInfo = self._query("mytanks")
+		tankXPos = int(tanksInfo[captureTank][6])
+		tankYPos = int(tanksInfo[captureTank][7])
+		self.setNextUnvisitedNode()
+		self.calculateAttractiveFieldAtPoint(tankXPos,tankYPos,self.currNodeToVisit)
+
+		while 1:
+			currTime = time.time()
+			tanksInfo = self._query("mytanks")
+			if(updateNodeTolerance < (currTime - visitNodeTime)):
+				visitNodeTime = time.time()	
+				self.setNextUnvisitedNode()
+				self.calculateAttractiveFieldAtPoint(tankXPos,tankYPos,self.currNodeToVisit)
+			
+			tanksInfo = self._query("mytanks")
+			tankXPos = int(tanksInfo[captureTank][6])
+			tankYPos = int(tanksInfo[captureTank][7])
+			self.calculateAttractiveFieldAtPoint(tankXPos,tankYPos,self.currNodeToVisit)
+			self.updateProbabilities(captureTank)
+			self.drawGrid()
+			
+			# check to see if the tank should rotate once pointed the right way crank up the speed!
+			tankHeading = self.getAdjustedAngle(float(tanksInfo[captureTank][8]))
+			if tankHeading > self.desiredHeading + self.HEADING_TOLERANCE:
+				self.commandAgent("angvel " + str(captureTank) + " -0.75")
+			elif tankHeading < self.desiredHeading - self.HEADING_TOLERANCE:
+				self.commandAgent("angvel " + str(captureTank) + " 0.75")
+			else:
+				self.commandAgent("angvel " + str(captureTank) + " 0")
+
+				magnitude = (self.fieldX[tankXPos][tankYPos]**2+self.fieldY[tankXPos][tankYPos]**2)**.5
+				if(magnitude > 1):
+					magnitude = 1
+				if(magnitude < -1):
+					magnitude = -1
+				self.commandAgent("speed " + str(captureTank) + " " + str(magnitude))
+	
+	
+	
+	
+	
+	
+	
+	
