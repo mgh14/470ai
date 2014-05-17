@@ -36,6 +36,8 @@ class OccAgent(PFAgent):
 		
 		# set sensor x,y
 		self._setSensorDimensions()
+		
+		init_window(self.worldHalfSize * 2, self.worldHalfSize * 2)
 
 	def _setSensorDimensions(self):
 		strList = self._getGrid(0)
@@ -311,3 +313,7 @@ class OccAgent(PFAgent):
 			probUnOcc = self.TRUE_NEGATIVE * (1 - self.probabilities[x][y])
 
 		return probOcc / (probOcc + probUnOcc)
+		
+	def drawGrid(self):
+		update_grid(self.probabilities)
+		draw_grid()
