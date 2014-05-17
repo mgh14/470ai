@@ -51,7 +51,7 @@ class PFAgent(Agent):
 	def calculateAttractiveFieldAtPoint(self, x, y, goals):
 		fieldStrength = 1
 		
-		innerRadius = 10
+		innerRadius = 25
 		outerRadius = 2*innerRadius
 	
 		deltaX = 0
