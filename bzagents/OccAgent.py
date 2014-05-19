@@ -309,7 +309,7 @@ class OccAgent(PFAgent):
 				if x % 100 == 0 and y % 100 == 0:
 					if self.visitedNodes[(x/100)-1][(y/100)-1] == 0:
 						self.visitedNodes[(x/100)-1][(y/100)-1] = 1
-						self.currNodeToVisit == [(0,0)]
+						self.currNodeToVisit == [(-1,-1)]
 						self.setNextUnvisitedNode()
 						self.visitNodeTime = time.time()
 						print self.currNodeToVisit
@@ -346,7 +346,7 @@ class OccAgent(PFAgent):
 			returnRandom = False
 			for y in range(6, 0,-1):
 				if self.visitedNodes[x][y] == 0:
-					if (x+1)*100 == self.currNodeToVisit[0][0] and (y+1)*100 == self.currNodeToVisit[0][1]:
+					if (x+1)*100-self.worldHalfSize == self.currNodeToVisit[0][0] and (y+1)*100-self.worldHalfSize == self.currNodeToVisit[0][1]:
 						returnRandom = True
 						break
 					self.currNodeToVisit = [((x+1)*100-self.worldHalfSize,(y+1)*100-self.worldHalfSize)]
