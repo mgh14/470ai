@@ -26,6 +26,7 @@ class OccAgent(PFAgent):
 	openGlWindowInitialized = False
 	visitedNodes = []
 	currNodeToVisit = [(0,0)]
+	visitNodeTime = 0
 
 
 	####### initialization functions
@@ -305,9 +306,13 @@ class OccAgent(PFAgent):
 					self.probabilities[x][y] = self.updateProbability( x, y, gridList[i][j] )
 				
 				#update visited nodes
-				if x % 50 == 0 and y % 50 == 0:
-					self.visitedNodes[(x/50)-1][(y/50)-1] = 1
-					self.setNextUnvisitedNode()
+				if x % 100 == 0 and y % 100 == 0:
+					if self.visitedNodes[(x/100)-1][(y/100)-1] == 0:
+						self.visitedNodes[(x/100)-1][(y/100)-1] = 1
+						self.currNodeToVisit == [(0,0)]
+						self.setNextUnvisitedNode()
+						self.visitNodeTime = time.time()
+						print self.currNodeToVisit
 					
 									
 	def updateProbability(self, x, y, observed_value):
@@ -337,21 +342,21 @@ class OccAgent(PFAgent):
 		draw_grid()
 		
 	def setNextUnvisitedNode(self):
-		for x in range(0, 14):
+		for x in range(0, 6):
 			returnRandom = False
-			for y in range(14, 0,-1):
+			for y in range(6, 0,-1):
 				if self.visitedNodes[x][y] == 0:
-					if x*50 == self.currNodeToVisit[0][0] and y == self.currNodeToVisit[0][1]:
+					if (x+1)*100 == self.currNodeToVisit[0][0] and (y+1)*100 == self.currNodeToVisit[0][1]:
 						returnRandom = True
 						break
-					self.currNodeToVisit = [((x+1)*50-self.worldHalfSize,(y+1)*50-self.worldHalfSize)]
+					self.currNodeToVisit = [((x+1)*100-self.worldHalfSize,(y+1)*100-self.worldHalfSize)]
 					return self.currNodeToVisit
 			if returnRandom == True:
 				break
 		
-		x = random.randint(1,15)
-		y = random.randint(1,15)
-		self.currNodeToVisit = [(x*50-self.worldHalfSize,y*50-self.worldHalfSize)]
+		x = random.randint(1,7)
+		y = random.randint(1,7)
+		self.currNodeToVisit = [(x*100-self.worldHalfSize,y*100-self.worldHalfSize)]
 		return self.currNodeToVisit
 		
 		
@@ -360,20 +365,22 @@ class OccAgent(PFAgent):
 		tanksInfo = self._query("mytanks")
 
 		updateNodeTolerance = 20
-		visitNodeTime = time.time()
+		self.visitNodeTime = time.time()
 		tanksInfo = self._query("mytanks")
 		tankXPos = int(tanksInfo[captureTank][6])
 		tankYPos = int(tanksInfo[captureTank][7])
 		self.setNextUnvisitedNode()
 		self.calculateAttractiveFieldAtPoint(tankXPos,tankYPos,self.currNodeToVisit)
+		print self.currNodeToVisit
 
 		while 1:
 			currTime = time.time()
 			tanksInfo = self._query("mytanks")
-			if(updateNodeTolerance < (currTime - visitNodeTime)):
-				visitNodeTime = time.time()	
+			if(updateNodeTolerance < (currTime - self.visitNodeTime)):
+				self.visitNodeTime = time.time()	
 				self.setNextUnvisitedNode()
 				self.calculateAttractiveFieldAtPoint(tankXPos,tankYPos,self.currNodeToVisit)
+				print self.currNodeToVisit
 			
 			tanksInfo = self._query("mytanks")
 			tankXPos = int(tanksInfo[captureTank][6])
