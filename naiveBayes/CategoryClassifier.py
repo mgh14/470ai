@@ -54,10 +54,10 @@ class CategoryClassifier(DocClassifier):
 					continue
 
 				# replace '@' and '.' chars with spaces
-				domainReplaceLine = re.sub(r'(@|\.|-|\n)+',' ',line)
+				specialCharLine = re.sub(r'(@|\.|-|\n)+',' ',line)
 
 				# only keep alphanumeric characters and spaces
-				strippedLine = re.sub(r'([^\s\w]|_)+', '', domainReplaceLine)
+				strippedLine = re.sub(r'([^\s\w]|_)+', '', specialCharLine)
 				arr = strippedLine.split()	# splits on whitespace by default
 				for word in arr:
 					if(word != '' and word not in self.stopWords):
