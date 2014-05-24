@@ -1,18 +1,50 @@
 from DocClassifier import *
+from ClassHolder import *
+from DocHolder import *
 
 class CategoryClassifier(DocClassifier):
-	trainingData = NOT_SET
+	classes = NOT_SET
+	totalDocs = NOT_SET
+
+	testData = NOT_SET
 
 	def __init__(self):
 		DocClassifier.__init__(self)
+
+		self.classes = dict()
+		self.totalDocs = 0
+
 		self._loadFiles()
 
 	def _loadFiles(self):
-		for directory in self.data:
+		print "Begin file load:"
+		for directory in self.files:	# for each class, do the following:
 			print "loading dir " + directory + "..."
-			for doc in self.data[directory]:
-				self.data[directory][doc] = self.loadFile(self.PATH_TO_TRAINING_DATA + directory + "/" + doc)
-		
+
+			classWords = dict()
+			for doc in self.files[directory]:
+				fileWordArray = self.loadFile(self.PATH_TO_TRAINING_DATA + directory + "/" + doc)
+				for word in fileWordArray:
+					#if(word in self.words):
+					#	self.words[word] += 1
+					#else:
+					#	self.words[word] = 1
+					numOfThisWord = fileWordArray[word]		
+					if(word in classWords):
+						classWords[word] += numOfThisWord
+					else:
+						classWords[word] = numOfThisWord
+
+			numDocsInClass = len(self.files[directory])
+			self.classes[directory] = ClassHolder(numDocsInClass,classWords)
+			print "\tnumWords in " + directory + ": " + str(self.classes[directory].getWordCount())
+			print "\tnumDocs in " + directory + ": " + str(self.classes[directory].getDocCount())
+
+			# add docs in class to total doc count
+			self.totalDocs += numDocsInClass
+
+		print "\nFinished. Total docs evaluated: " + str(self.totalDocs)
+
 	def loadFile(self,filename):
 		wordArray = dict()
 		with open(filename) as f:
@@ -32,6 +64,10 @@ class CategoryClassifier(DocClassifier):
 							wordArray[word] = 1
 		#print str(wordArray)
 		return wordArray
+
+	def classifyFile(self,filename):
+		pass
+		# calculate probabilities of each class:
 
 	def train(self):
 		print str(self.data)
