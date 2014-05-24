@@ -21,12 +21,12 @@ class DocClassifier(object):
 		dirs = os.listdir(self.PATH_TO_TRAINING_DATA)
 		for directory in dirs:
 			# create directory class
-			self.data[directory] = []
+			self.data[directory] = dict()
 
 			# insert document names
 			files = os.listdir(self.PATH_TO_TRAINING_DATA + "/" + directory)
 			for doc in files:
-				self.data[directory].append(doc)
+				self.data[directory][doc] = []
 
 			# (words inserted differently for children, thus not included here)
 

@@ -11,7 +11,7 @@ class CategoryClassifier(DocClassifier):
 		for directory in self.data:
 			print "loading dir " + directory + "..."
 			for doc in self.data[directory]:
-				self.loadFile(self.PATH_TO_TRAINING_DATA + directory + "/" + doc)
+				self.data[directory][doc] = self.loadFile(self.PATH_TO_TRAINING_DATA + directory + "/" + doc)
 		
 	def loadFile(self,filename):
 		wordArray = dict()
