@@ -53,9 +53,12 @@ class CategoryClassifier(DocClassifier):
 				if(len(line) <= 0):
 					continue
 
+				# replace '@' and '.' chars with spaces
+				domainReplaceLine = re.sub(r'(@|\.|-|\n)+',' ',line)
+
 				# only keep alphanumeric characters and spaces
-				line2 = re.sub(r'([^\s\w]|_|\n)+', '', line)
-				arr = line2.split()	# splits on whitespace by default
+				strippedLine = re.sub(r'([^\s\w]|_)+', '', domainReplaceLine)
+				arr = strippedLine.split()	# splits on whitespace by default
 				for word in arr:
 					if(word != '' and word not in self.stopWords):
 						if(word in wordArray):
@@ -79,8 +82,6 @@ class CategoryClassifier(DocClassifier):
 		return maxClass
 
 	def classifyDoc(self,filename):
-		pass
+		fileWordArray = self.loadFile(filename)
+		#print "filewords: " + str(fileWordArray)
 		# calculate probabilities of each class:
-
-	def train(self):
-		print str(self.data)
