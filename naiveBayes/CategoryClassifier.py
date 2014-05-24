@@ -14,10 +14,10 @@ class CategoryClassifier(DocClassifier):
 		self.classes = dict()
 		self.totalDocs = 0
 
-		self._loadFiles()
+		self._train()
 
-	def _loadFiles(self):
-		print "Begin file load:"
+	def _train(self):
+		print "Training from files:"
 		for directory in self.files:	# for each class, do the following:
 			print "loading dir " + directory + "..."
 
@@ -36,14 +36,14 @@ class CategoryClassifier(DocClassifier):
 						classWords[word] = numOfThisWord
 
 			numDocsInClass = len(self.files[directory])
-			self.classes[directory] = ClassHolder(numDocsInClass,classWords)
+			self.classes[directory] = ClassHolder(directory,numDocsInClass,classWords)
 			print "\tnumWords in " + directory + ": " + str(self.classes[directory].getWordCount())
 			print "\tnumDocs in " + directory + ": " + str(self.classes[directory].getDocCount())
 
 			# add docs in class to total doc count
 			self.totalDocs += numDocsInClass
 
-		print "\nFinished. Total docs evaluated: " + str(self.totalDocs)
+		print "\nFinished training. " + str(self.totalDocs) + " docs evaluated over " + str(len(self.classes)) + " classes."
 
 	def loadFile(self,filename):
 		wordArray = dict()
@@ -54,7 +54,7 @@ class CategoryClassifier(DocClassifier):
 					continue
 
 				# only keep alphanumeric characters and spaces
-				line2 = re.sub(r'([^\s\w]|_)+', '', line)
+				line2 = re.sub(r'([^\s\w]|_|\n)+', '', line)
 				arr = line2.split()	# splits on whitespace by default
 				for word in arr:
 					if(word != '' and word not in self.stopWords):
@@ -65,7 +65,20 @@ class CategoryClassifier(DocClassifier):
 		#print str(wordArray)
 		return wordArray
 
-	def classifyFile(self,filename):
+	def classifyDocByBaseline(self,filename):
+		maxClass = NOT_SET
+		highestDocs = 0
+		for newsClass in self.classes:
+			classObj = self.classes[newsClass]
+
+			currDocCount = classObj.getDocCount()
+			if(currDocCount > highestDocs):
+				highestDocs = currDocCount
+				maxClass = newsClass
+
+		return maxClass
+
+	def classifyDoc(self,filename):
 		pass
 		# calculate probabilities of each class:
 
