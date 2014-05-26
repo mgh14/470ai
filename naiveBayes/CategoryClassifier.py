@@ -24,10 +24,6 @@ class CategoryClassifier(DocClassifier):
 			for doc in self.trainFiles[directory]:
 				fileWordArray = self.loadFile(self.PATH_TO_TRAINING_DATA + directory + "/" + doc)
 				for word in fileWordArray:
-					#if(word in self.words):
-					#	self.words[word] += 1
-					#else:
-					#	self.words[word] = 1
 					numOfThisWord = fileWordArray[word]		
 					if(word in classWords):
 						classWords[word] += numOfThisWord
@@ -78,16 +74,6 @@ class CategoryClassifier(DocClassifier):
 				maxClass = newsClass
 
 		return maxClass
-
-	def _getClassesDictionary(self):
-		classificationDict = dict()
-		for className in self.trainFiles:
-			try:
-				classificationDict[className] = 0
-			except KeyError:
-				classificationDict[className] = 0
-
-		return classificationDict
 
 	def classifyTrainingDataByBaseline(self):
 		print "Classifying training data by baseline..."

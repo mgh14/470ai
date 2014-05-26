@@ -50,3 +50,14 @@ class DocClassifier(object):
 		with open(filename) as f:
 			for line in f:
 				self.stopWords.append(line.strip())
+
+
+	def _getClassesDictionary(self):
+		classificationDict = dict()
+		for className in self.trainFiles:
+			try:
+				classificationDict[className] = 0
+			except KeyError:
+				classificationDict[className] = 0
+
+		return classificationDict
