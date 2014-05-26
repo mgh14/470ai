@@ -8,26 +8,36 @@ class DocClassifier(object):
 	PATH_TO_TRAINING_DATA = "20news-bydate-train/"
 	PATH_TO_TEST_DATA = "20news-bydate-test/"
 
-	files = NOT_SET
+	trainFiles = NOT_SET
+	testFiles = NOT_SET
 	stopWords = NOT_SET
 
 	def __init__(self):
-		self.files = dict()
+		self.trainFiles = dict()
+		self.testFiles = dict()
 
-		self._initializeFileStructure()
+		self._initializeFileStructures()
 		self._loadStopwords("stopwords.txt")
 
-	def _initializeFileStructure(self):
+	def _initializeFileStructures(self):
 
-		dirs = os.listdir(self.PATH_TO_TRAINING_DATA)
-		for directory in dirs:
+		trainDirs = os.listdir(self.PATH_TO_TRAINING_DATA)
+		for directory in trainDirs:
 			# create array of document names for class name (a.k.a. directory)
-			self.files[directory] = []
-			dirFiles = os.listdir(self.PATH_TO_TRAINING_DATA + "/" + directory)
-			for doc in dirFiles:
-				self.files[directory].append(doc)
+			self.trainFiles[directory] = []
+			trainDirFiles = os.listdir(self.PATH_TO_TRAINING_DATA + "/" + directory)
+			for doc in trainDirFiles:
+				self.trainFiles[directory].append(doc)
 
 			# (words inserted differently for children classes, thus not included here)
+
+		testDirs = os.listdir(self.PATH_TO_TEST_DATA)
+		for directory in testDirs:
+			# create array of document names for class name (a.k.a. directory)
+			self.testFiles[directory] = []
+			testDirFiles = os.listdir(self.PATH_TO_TEST_DATA + "/" + directory)
+			for doc in testDirFiles:
+				self.testFiles[directory].append(doc)
 
 	def _loadStopwords(self,filename):
 		self.stopWords = []
