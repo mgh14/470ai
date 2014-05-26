@@ -1,6 +1,5 @@
 from DocClassifier import *
 from ClassHolder import *
-from DocHolder import *
 
 class CategoryClassifier(DocClassifier):
 	classes = NOT_SET
@@ -43,7 +42,7 @@ class CategoryClassifier(DocClassifier):
 			# add docs in class to total doc count
 			self.totalDocs += numDocsInClass
 
-		print "\nFinished training. " + str(self.totalDocs) + " docs evaluated over " + str(len(self.classes)) + " classes."
+		print "\nFinished training. " + str(self.totalDocs) + " docs evaluated over " + str(len(self.classes)) + " classes.\n"
 
 	def loadFile(self,filename):
 		wordArray = dict()
@@ -79,43 +78,138 @@ class CategoryClassifier(DocClassifier):
 				maxClass = newsClass
 
 		return maxClass
-		
-	def classifyTrainData(self):
+
+	def classifyTrainingDataByBaseline(self):
+		print "Classifying training data by baseline..."
 		counter = 0
+		classificationNums = dict()
 		for className in self.trainFiles:
-			print "Classifying " + className + "..."
+			print "\tClassifying " + className + "..."
+			classDocs = self.trainFiles[className]
+
+			docClass = self.classes[className]
+			for doc in classDocs:
+				filepath = str(self.PATH_TO_TRAINING_DATA + className + "/" + doc)
+				classification = self.classifyDocByBaseline(filepath)
+				try:
+					classificationNums[classification] += 1
+				except KeyError:
+					classificationNums[classification] = 1
+
+				if(className == classification):
+					counter += 1
+					#print "classification: " + str(className + "/" + doc) + ": " + str(classification)	
+
+		print "finished classifying training data. " + str(counter) + " correctly classified instances out of " + str(self.totalTrainFiles) + " (" + str(float(counter)/self.totalTrainFiles) +"1)\n"
+		
+
+		print "Results:"
+		total = 0
+		for className in classificationNums:
+			print className + ": " + str(classificationNums[className])
+			total += classificationNums[className]
+
+		print "total classifications: " + str(total) + "\n"
+		
+	def classifyTestDataByBaseline(self):
+		print "Classifying test data by baseline..."
+		counter = 0
+		classificationNums = dict()
+		for className in self.testFiles:
+			print "\tClassifying " + className + "..."
+			classDocs = self.testFiles[className]
+
+			docClass = self.classes[className]
+			for doc in classDocs:
+				filepath = str(self.PATH_TO_TEST_DATA + className + "/" + doc)
+				classification = self.classifyDocByBaseline(filepath)
+				try:
+					classificationNums[classification] += 1
+				except KeyError:
+					classificationNums[classification] = 1
+
+				if(className == classification):
+					counter += 1
+					#print "classification: " + str(className + "/" + doc) + ": " + str(classification)	
+
+		print "finished classifying training data. " + str(counter) + " correctly classified instances out of " + str(self.totalTestFiles) + " (" + str(float(counter)/self.totalTestFiles) +")\n"
+		
+
+		print "Results:"
+		total = 0
+		for className in classificationNums:
+			print className + ": " + str(classificationNums[className])
+			total += classificationNums[className]
+
+		print "total classifications: " + str(total) + "\n"
+
+
+	def classifyTrainData(self):
+		print "Classifying training data..."
+		counter = 0
+		classificationNums = dict()
+		for className in self.trainFiles:
+			print "\tClassifying " + className + "..."
 			classDocs = self.trainFiles[className]
 
 			docClass = self.classes[className]
 			for doc in classDocs:
 				filepath = str(self.PATH_TO_TRAINING_DATA + className + "/" + doc)
 				classification = self.classifyDoc(filepath)
+				try:
+					classificationNums[classification[0]] += 1
+				except KeyError:
+					classificationNums[classification[0]] = 1
+
 				if(className == classification[0]):
 					counter += 1
 					#print "classification: " + str(className + "/" + doc) + ": " + str(classification)	
 
-		print "finished classifying training data. " + str(counter) + " correctly classified instances out of " + str(self.totalTrainFiles)
+		print "finished classifying training data. " + str(counter) + " correctly classified instances out of " + str(self.totalTrainFiles) + " (" + str(float(counter)/self.totalTrainFiles) +")\n"
 		
 
+		print "Results:"
+		total = 0
+		for className in classificationNums:
+			print className + ": " + str(classificationNums[className])
+			total += classificationNums[className]
+
+		print "total classifications: " + str(total) + "\n"
+
 	def classifyTestData(self):
+		print "Classifying test data..."
 		counter = 0
+		classificationNums = dict()
 		for className in self.testFiles:
-			print "Classifying " + className + "..."
+			print "\tClassifying " + className + "..."
 			classDocs = self.testFiles[className]
 
 			docClass = self.classes[className]
 			for doc in classDocs:
 				filepath = str(self.PATH_TO_TEST_DATA + className + "/" + doc)
 				classification = self.classifyDoc(filepath)
+				try:
+					classificationNums[classification[0]] += 1
+				except KeyError:
+					classificationNums[classification[0]] = 1
+
 				if(className == classification[0]):
 					counter += 1
 					#print "classification: " + str(className + "/" + doc) + ": " + str(classification)	
 
-		print "finished classifying test data. " + str(counter) + " correctly classified instances out of " + str(self.totalTestFiles)
+		print "finished classifying test data. " + str(counter) + " correctly classified instances out of " + str(self.totalTestFiles) + " (" + str(float(counter)/self.totalTestFiles) +")\n"
+
+		print "Results:"
+		total = 0
+		for className in classificationNums:
+			print className + ": " + str(classificationNums[className])
+			total += classificationNums[className]
+
+		print "total classifications: " + str(total) + "\n"
 		
 	def classifyDoc(self,filename):
 		fileWordArray = self.loadFile(filename)
-		#print "filewords: " + str(fileWordArray)
+
 		# calculate probabilities of each class:
 		classProbabilities = dict()
 		for className in self.classes:
@@ -135,7 +229,7 @@ class CategoryClassifier(DocClassifier):
 
 			classProbabilities[className] = classProbability + probability
 		
-		# figure out which of the probabilities for each class is the highest
+		# figure out which of the probabilities for each class is the highest and return that prediction
 		highestProbability = -1000000
 		mostLikelyClass = NOT_SET
 		for className in classProbabilities:
