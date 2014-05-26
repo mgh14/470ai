@@ -79,28 +79,48 @@ class CategoryClassifier(DocClassifier):
 
 		return maxClass
 
+	def _getClassesDictionary(self):
+		classificationDict = dict()
+		for className in self.trainFiles:
+			try:
+				classificationDict[className] = 0
+			except KeyError:
+				classificationDict[className] = 0
+
+		return classificationDict
+
 	def classifyTrainingDataByBaseline(self):
 		print "Classifying training data by baseline..."
+
 		counter = 0
-		classificationNums = dict()
+		classificationNums = self._getClassesDictionary()
 		for className in self.trainFiles:
 			print "\tClassifying " + className + "..."
 			classDocs = self.trainFiles[className]
 
 			docClass = self.classes[className]
+			classClassificationNums = self._getClassesDictionary()
+
+			classDocCounter = 0
 			for doc in classDocs:
 				filepath = str(self.PATH_TO_TRAINING_DATA + className + "/" + doc)
 				classification = self.classifyDocByBaseline(filepath)
-				try:
-					classificationNums[classification] += 1
-				except KeyError:
-					classificationNums[classification] = 1
 
+				# update class classification numbers
+				classClassificationNums[classification] += 1
+
+				# update overall classification numbers
+				classificationNums[classification] += 1
+
+				classDocCounter += 1
 				if(className == classification):
 					counter += 1
-					#print "classification: " + str(className + "/" + doc) + ": " + str(classification)	
 
-		print "finished classifying training data. " + str(counter) + " correctly classified instances out of " + str(self.totalTrainFiles) + " (" + str(float(counter)/self.totalTrainFiles) +"1)\n"
+			print "\t\tClass results (out of " + str(classDocCounter) + "):"
+			for classNameAgain in classClassificationNums:
+				print "\t\t\t" + classNameAgain + ": " + str(classClassificationNums[classNameAgain]) + " out of " + str(classDocCounter)
+
+		print "\nfinished classifying training data. " + str(counter) + " correctly classified instances out of " + str(self.totalTrainFiles) + " (" + str(float(counter)/self.totalTrainFiles) +" accuracy)\n"
 		
 
 		print "Results:"
@@ -109,30 +129,40 @@ class CategoryClassifier(DocClassifier):
 			print className + ": " + str(classificationNums[className])
 			total += classificationNums[className]
 
-		print "total classifications: " + str(total) + "\n"
+		print "\ntotal classifications: " + str(total) + "\n"
 		
 	def classifyTestDataByBaseline(self):
 		print "Classifying test data by baseline..."
+
 		counter = 0
-		classificationNums = dict()
+		classificationNums = self._getClassesDictionary()
 		for className in self.testFiles:
 			print "\tClassifying " + className + "..."
 			classDocs = self.testFiles[className]
 
 			docClass = self.classes[className]
+			classClassificationNums = self._getClassesDictionary()
+
+			classDocCounter = 0
 			for doc in classDocs:
 				filepath = str(self.PATH_TO_TEST_DATA + className + "/" + doc)
 				classification = self.classifyDocByBaseline(filepath)
-				try:
-					classificationNums[classification] += 1
-				except KeyError:
-					classificationNums[classification] = 1
 
+				# update class classification numbers
+				classClassificationNums[classification] += 1
+
+				# update overall classification numbers
+				classificationNums[classification] += 1
+
+				classDocCounter += 1
 				if(className == classification):
 					counter += 1
-					#print "classification: " + str(className + "/" + doc) + ": " + str(classification)	
 
-		print "finished classifying training data. " + str(counter) + " correctly classified instances out of " + str(self.totalTestFiles) + " (" + str(float(counter)/self.totalTestFiles) +")\n"
+			print "\t\tClass results (out of " + str(classDocCounter) + "):"
+			for classNameAgain in classClassificationNums:
+				print "\t\t\t" + classNameAgain + ": " + str(classClassificationNums[classNameAgain]) + " out of " + str(classDocCounter)
+
+		print "\nfinished classifying test data. " + str(counter) + " correctly classified instances out of " + str(self.totalTestFiles) + " (" + str(float(counter)/self.totalTestFiles) +" accuracy)\n"
 		
 
 		print "Results:"
@@ -141,31 +171,40 @@ class CategoryClassifier(DocClassifier):
 			print className + ": " + str(classificationNums[className])
 			total += classificationNums[className]
 
-		print "total classifications: " + str(total) + "\n"
-
+		print "\ntotal classifications: " + str(total) + "\n"
 
 	def classifyTrainData(self):
 		print "Classifying training data..."
+
 		counter = 0
-		classificationNums = dict()
+		classificationNums = self._getClassesDictionary()
 		for className in self.trainFiles:
 			print "\tClassifying " + className + "..."
 			classDocs = self.trainFiles[className]
 
 			docClass = self.classes[className]
+			classClassificationNums = self._getClassesDictionary()
+
+			classDocCounter = 0
 			for doc in classDocs:
 				filepath = str(self.PATH_TO_TRAINING_DATA + className + "/" + doc)
 				classification = self.classifyDoc(filepath)
-				try:
-					classificationNums[classification[0]] += 1
-				except KeyError:
-					classificationNums[classification[0]] = 1
 
-				if(className == classification[0]):
+				# update class classification numbers
+				classClassificationNums[classification[0]] += 1
+
+				# update overall classification numbers
+				classificationNums[classification[0]] += 1
+
+				classDocCounter += 1
+				if(className == classification):
 					counter += 1
-					#print "classification: " + str(className + "/" + doc) + ": " + str(classification)	
 
-		print "finished classifying training data. " + str(counter) + " correctly classified instances out of " + str(self.totalTrainFiles) + " (" + str(float(counter)/self.totalTrainFiles) +")\n"
+			print "\t\tClass results (out of " + str(classDocCounter) + "):"
+			for classNameAgain in classClassificationNums:
+				print "\t\t\t" + classNameAgain + ": " + str(classClassificationNums[classNameAgain]) + " out of " + str(classDocCounter)
+
+		print "\nfinished classifying training data. " + str(counter) + " correctly classified instances out of " + str(self.totalTrainFiles) + " (" + str(float(counter)/self.totalTrainFiles) +" accuracy)\n"
 		
 
 		print "Results:"
@@ -174,30 +213,41 @@ class CategoryClassifier(DocClassifier):
 			print className + ": " + str(classificationNums[className])
 			total += classificationNums[className]
 
-		print "total classifications: " + str(total) + "\n"
+		print "\ntotal classifications: " + str(total) + "\n"
 
 	def classifyTestData(self):
 		print "Classifying test data..."
+
 		counter = 0
-		classificationNums = dict()
+		classificationNums = self._getClassesDictionary()
 		for className in self.testFiles:
 			print "\tClassifying " + className + "..."
 			classDocs = self.testFiles[className]
 
 			docClass = self.classes[className]
+			classClassificationNums = self._getClassesDictionary()
+
+			classDocCounter = 0
 			for doc in classDocs:
 				filepath = str(self.PATH_TO_TEST_DATA + className + "/" + doc)
 				classification = self.classifyDoc(filepath)
-				try:
-					classificationNums[classification[0]] += 1
-				except KeyError:
-					classificationNums[classification[0]] = 1
 
-				if(className == classification[0]):
+				# update class classification numbers
+				classClassificationNums[classification[0]] += 1
+
+				# update overall classification numbers
+				classificationNums[classification[0]] += 1
+
+				classDocCounter += 1
+				if(className == classification):
 					counter += 1
-					#print "classification: " + str(className + "/" + doc) + ": " + str(classification)	
 
-		print "finished classifying test data. " + str(counter) + " correctly classified instances out of " + str(self.totalTestFiles) + " (" + str(float(counter)/self.totalTestFiles) +")\n"
+			print "\t\tClass results (out of " + str(classDocCounter) + "):"
+			for classNameAgain in classClassificationNums:
+				print "\t\t\t" + classNameAgain + ": " + str(classClassificationNums[classNameAgain]) + " out of " + str(classDocCounter)
+
+		print "\nfinished classifying training data. " + str(counter) + " correctly classified instances out of " + str(self.totalTestFiles) + " (" + str(float(counter)/self.totalTestFiles) +" accuracy)\n"
+		
 
 		print "Results:"
 		total = 0
@@ -205,8 +255,8 @@ class CategoryClassifier(DocClassifier):
 			print className + ": " + str(classificationNums[className])
 			total += classificationNums[className]
 
-		print "total classifications: " + str(total) + "\n"
-		
+		print "\ntotal classifications: " + str(total) + "\n"		
+
 	def classifyDoc(self,filename):
 		fileWordArray = self.loadFile(filename)
 
