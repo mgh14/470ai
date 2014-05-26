@@ -18,11 +18,11 @@ class CategoryClassifier(DocClassifier):
 
 	def _train(self):
 		print "Training from files:"
-		for directory in self.files:	# for each class, do the following:
+		for directory in self.trainFiles:	# for each class, do the following:
 			print "loading dir " + directory + "..."
 
 			classWords = dict()
-			for doc in self.files[directory]:
+			for doc in self.trainFiles[directory]:
 				fileWordArray = self.loadFile(self.PATH_TO_TRAINING_DATA + directory + "/" + doc)
 				for word in fileWordArray:
 					#if(word in self.words):
@@ -35,7 +35,7 @@ class CategoryClassifier(DocClassifier):
 					else:
 						classWords[word] = numOfThisWord
 
-			numDocsInClass = len(self.files[directory])
+			numDocsInClass = len(self.trainFiles[directory])
 			self.classes[directory] = ClassHolder(directory,numDocsInClass,classWords)
 			print "\tnumWords in " + directory + ": " + str(self.classes[directory].getWordCount())
 			print "\tnumDocs in " + directory + ": " + str(self.classes[directory].getDocCount())
@@ -53,7 +53,7 @@ class CategoryClassifier(DocClassifier):
 				if(len(line) <= 0):
 					continue
 
-				# replace '@' and '.' chars with spaces
+				# replace special chars chars with spaces
 				specialCharLine = re.sub(r'(@|\.|-|\n)+',' ',line)
 
 				# only keep alphanumeric characters and spaces
@@ -65,7 +65,6 @@ class CategoryClassifier(DocClassifier):
 							wordArray[word] += 1
 						else:
 							wordArray[word] = 1
-		#print str(wordArray)
 		return wordArray
 
 	def classifyDocByBaseline(self,filename):
@@ -81,7 +80,58 @@ class CategoryClassifier(DocClassifier):
 
 		return maxClass
 
+	def classifyTestData(self):
+		for className in self.testFiles:
+			classDocs = self.testFiles[className]
+
+			docClass = self.classes[className]
+			for doc in classDocs:
+				filepath = str(self.PATH_TO_TEST_DATA + className + "/" + doc)
+				classification = self.classifyDoc(filepath)
+				#print "classification: " + filepath
+
+		print "finished classifying data."
+
+	def classifyDoc2(self,filename):
+		print "\tclassifying: " + filename
+		
 	def classifyDoc(self,filename):
+		print "classifying: " + filename
+		pass
 		fileWordArray = self.loadFile(filename)
 		#print "filewords: " + str(fileWordArray)
 		# calculate probabilities of each class:
+		classProbabilities = dict()
+		for className in self.classes:
+			docClass = self.classes[className]
+			
+			# start probability calc with p(class)
+			classProbabilities[className] = 0
+			classProbability = docClass.getDocCount() / self.totalDocs
+			classWordCount = docClass.getWordCount()
+			for word in fileWordArray:
+				try:
+					numOccurrences = docClass.words[word]
+				except KeyError:
+					numOccurrences = 1	# smoothing effect
+
+				#classProbability = (numOccurrences/classWordCount)^^fileWordArray[word] * classProbability
+				print "\tVal for " + className + ":" + word + ": " + str(numOccurrences)
+				print "\t" + word + " " + str(fileWordArray[word])
+				#print "\tprob of word: " + str(probabilityOfWord)
+				print "\tprobability: " + str(numOccurrences) + "/" + str(classWordCount) + "=" + str(numOccurrences/classWordCount)
+			#classProbabilities[className] = classProbability
+			print "p(class | d): " + str(classProbabilities[className])
+
+			sys.exit(0)
+		
+		# figure out which of the probabilities for each class is the highest
+		highestProbability = NOT_SET
+		mostLikelyClass = NOT_SET
+		for className in classProbabilities:
+			classProbability = classProbabilities[className]
+			if(classProbability > highestProbability):
+				highestProbability = classProbability
+				highestClass = className
+
+		return [mostLikelyClass,highestProbability]
