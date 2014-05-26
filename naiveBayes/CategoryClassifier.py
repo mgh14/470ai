@@ -79,8 +79,25 @@ class CategoryClassifier(DocClassifier):
 				maxClass = newsClass
 
 		return maxClass
+		
+	def classifyTrainData(self):
+		counter = 0
+		for className in self.trainFiles:
+			classDocs = self.trainFiles[className]
+
+			docClass = self.classes[className]
+			for doc in classDocs:
+				filepath = str(self.PATH_TO_TRAINING_DATA + className + "/" + doc)
+				classification = self.classifyDoc(filepath)
+				if(className == classification[0]):
+					counter += 1
+					#print "classification: " + str(className + "/" + doc) + ": " + str(classification)	
+
+		print "finished classifying data. " + str(counter) + " correctly classified instances out of " + str(self.totalTrainFiles)
+		
 
 	def classifyTestData(self):
+		counter = 0
 		for className in self.testFiles:
 			classDocs = self.testFiles[className]
 
@@ -88,16 +105,13 @@ class CategoryClassifier(DocClassifier):
 			for doc in classDocs:
 				filepath = str(self.PATH_TO_TEST_DATA + className + "/" + doc)
 				classification = self.classifyDoc(filepath)
-				#print "classification: " + filepath
+				if(className == classification[0]):
+					counter += 1
+					#print "classification: " + str(className + "/" + doc) + ": " + str(classification)	
 
-		print "finished classifying data."
-
-	def classifyDoc2(self,filename):
-		print "\tclassifying: " + filename
+		print "finished classifying data. " + str(counter) + " correctly classified instances out of " + str(self.totalTestFiles)
 		
 	def classifyDoc(self,filename):
-		print "classifying: " + filename
-		pass
 		fileWordArray = self.loadFile(filename)
 		#print "filewords: " + str(fileWordArray)
 		# calculate probabilities of each class:
@@ -106,8 +120,7 @@ class CategoryClassifier(DocClassifier):
 			docClass = self.classes[className]
 			
 			# start probability calc with p(class)
-			classProbabilities[className] = 0
-			classProbability = docClass.getDocCount() / self.totalDocs
+			classProbability = math.log(float(docClass.getDocCount()) / self.totalDocs)
 			classWordCount = docClass.getWordCount()
 			for word in fileWordArray:
 				try:
@@ -115,23 +128,18 @@ class CategoryClassifier(DocClassifier):
 				except KeyError:
 					numOccurrences = 1	# smoothing effect
 
-				#classProbability = (numOccurrences/classWordCount)^^fileWordArray[word] * classProbability
-				print "\tVal for " + className + ":" + word + ": " + str(numOccurrences)
-				print "\t" + word + " " + str(fileWordArray[word])
-				#print "\tprob of word: " + str(probabilityOfWord)
-				print "\tprobability: " + str(numOccurrences) + "/" + str(classWordCount) + "=" + str(numOccurrences/classWordCount)
-			#classProbabilities[className] = classProbability
-			print "p(class | d): " + str(classProbabilities[className])
+				probability = math.log((float(numOccurrences)/classWordCount))
+				probability *= fileWordArray[word]	# nlogx = log(x^n)
 
-			sys.exit(0)
+			classProbabilities[className] = classProbability + probability
 		
 		# figure out which of the probabilities for each class is the highest
-		highestProbability = NOT_SET
+		highestProbability = -1000000
 		mostLikelyClass = NOT_SET
 		for className in classProbabilities:
 			classProbability = classProbabilities[className]
 			if(classProbability > highestProbability):
 				highestProbability = classProbability
-				highestClass = className
+				mostLikelyClass = className
 
 		return [mostLikelyClass,highestProbability]
