@@ -83,6 +83,7 @@ class CategoryClassifier(DocClassifier):
 	def classifyTrainData(self):
 		counter = 0
 		for className in self.trainFiles:
+			print "Classifying " + className + "..."
 			classDocs = self.trainFiles[className]
 
 			docClass = self.classes[className]
@@ -93,12 +94,13 @@ class CategoryClassifier(DocClassifier):
 					counter += 1
 					#print "classification: " + str(className + "/" + doc) + ": " + str(classification)	
 
-		print "finished classifying data. " + str(counter) + " correctly classified instances out of " + str(self.totalTrainFiles)
+		print "finished classifying training data. " + str(counter) + " correctly classified instances out of " + str(self.totalTrainFiles)
 		
 
 	def classifyTestData(self):
 		counter = 0
 		for className in self.testFiles:
+			print "Classifying " + className + "..."
 			classDocs = self.testFiles[className]
 
 			docClass = self.classes[className]
@@ -109,7 +111,7 @@ class CategoryClassifier(DocClassifier):
 					counter += 1
 					#print "classification: " + str(className + "/" + doc) + ": " + str(classification)	
 
-		print "finished classifying data. " + str(counter) + " correctly classified instances out of " + str(self.totalTestFiles)
+		print "finished classifying test data. " + str(counter) + " correctly classified instances out of " + str(self.totalTestFiles)
 		
 	def classifyDoc(self,filename):
 		fileWordArray = self.loadFile(filename)
