@@ -173,21 +173,19 @@ class BernoulliClassifier(DocClassifier):
 					try:
 						probFalseButInClass = math.log(1 - float(docWords[word])/classDocCount)
 					except ValueError:
-						probFalseButInClass = 1e-100
+						probFalseButInClass = math.log(1e-100)
 					probVar = probFalseButInClass
 				elif(wordInDocWords and wordInFileWordArray):
 					probTrueInClass = math.log(float(docWords[word])/classDocCount)		 
 					probVar = probTrueInClass
+				elif(not wordInDocWords and not wordInFileWordArray):
+					probFalseAndNotInClass = probOutsideClass
+					probVar = probFalseAndNotInClass
+				elif(not wordInDocWords and wordInFileWordArray):
+					probFalseAndInClass = probOutsideClass
+					probVar = probFalseAndInClass
 				else:
-					probVar = 0
-				#elif(not wordInDocWords and not wordInFileWordArray):
-				#	probFalseAndNotInClass = probOutsideClass
-				#	probVar = 0#probFalseAndNotInClass
-				#elif(not wordInDocWords and wordInFileWordArray):
-				#	probFalseAndInClass = probOutsideClass
-				#	probVar = 0#probFalseAndInClass
-				#else:
-				#	raise Exception("This shouldn't happen")
+					raise Exception("This shouldn't happen")
 
 				classProbability += probVar
 
