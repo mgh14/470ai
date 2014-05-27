@@ -48,7 +48,7 @@ class CategoryClassifier(DocClassifier):
 				if(len(line) <= 0):
 					continue
 
-				# replace special chars chars with spaces
+				# replace special chars with spaces
 				specialCharLine = re.sub(r'(@|\.|-|\n)+',' ',line)
 
 				# only keep alphanumeric characters and spaces
