@@ -183,7 +183,7 @@ class CategoryClassifier(DocClassifier):
 				classificationNums[classification[0]] += 1
 
 				classDocCounter += 1
-				if(className == classification):
+				if(className == classification[0]):
 					counter += 1
 
 			print "\t\tClass results (out of " + str(classDocCounter) + "):"
@@ -225,7 +225,7 @@ class CategoryClassifier(DocClassifier):
 				classificationNums[classification[0]] += 1
 
 				classDocCounter += 1
-				if(className == classification):
+				if(className == classification[0]):
 					counter += 1
 
 			print "\t\tClass results (out of " + str(classDocCounter) + "):"
@@ -262,8 +262,9 @@ class CategoryClassifier(DocClassifier):
 
 				probability = math.log((float(numOccurrences)/classWordCount))
 				probability *= fileWordArray[word]	# nlogx = log(x^n)
+				classProbability += probability
 
-			classProbabilities[className] = classProbability + probability
+			classProbabilities[className] = classProbability
 		
 		# figure out which of the probabilities for each class is the highest and return that prediction
 		highestProbability = -1000000
