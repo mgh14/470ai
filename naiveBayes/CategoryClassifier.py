@@ -159,7 +159,7 @@ class CategoryClassifier(DocClassifier):
 
 		print "\ntotal classifications: " + str(total) + "\n"
 
-	def classifyTrainData(self):
+	def classifyTrainingData(self):
 		print "Classifying training data..."
 
 		counter = 0
