@@ -190,9 +190,9 @@ class BernoulliClassifier(DocClassifier):
 				classProbability += probVar
 
 			classProbabilities[className] = classProbability
-		print("exit classes")
+
 		# figure out which of the probabilities for each class is the highest and return that prediction
-		highestProbability = -1000000
+		highestProbability = float("-inf")
 		mostLikelyClass = NOT_SET
 		for className in classProbabilities:
 			classProbability = classProbabilities[className]
