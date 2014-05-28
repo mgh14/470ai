@@ -41,6 +41,10 @@ class BernoulliClassifier(DocClassifier):
 
 		print "\nFinished training. " + str(self.totalDocs) + " docs evaluated over " + str(len(self.classes)) + " classes.\n"
 
+		print "numWords:" 
+		for dclass in self.classes:
+			print "class; " + dclass + " " + str(len(self.classes[dclass].words))
+
 	def loadFile(self,filename):
 		wordArray = dict()
 		with open(filename) as f:
@@ -82,7 +86,7 @@ class BernoulliClassifier(DocClassifier):
 				myCounter += 1
 				filepath = str(self.PATH_TO_TRAINING_DATA + className + "/" + doc)
 				classification = self.classifyDoc(filepath)
-				print "classify: " + str(myCounter)
+				print "classify: " + str(myCounter) + " " + classification[0]
 
 				# update class classification numbers
 				classClassificationNums[classification[0]] += 1
@@ -125,6 +129,7 @@ class BernoulliClassifier(DocClassifier):
 			for doc in classDocs:
 				filepath = str(self.PATH_TO_TEST_DATA + className + "/" + doc)
 				classification = self.classifyDoc(filepath)
+				print "classified: " + filepath + "; " + classification[0]
 
 				# update class classification numbers
 				classClassificationNums[classification[0]] += 1
