@@ -4,21 +4,24 @@ from numpy import matrix, identity
 
 class KalmanFilter():
 	
-	def __init__(self, noise):
-		#initial values
-		self.u_initial = matrix([[0],
-								 [0],
-								 [0],
-								 [0],
-								 [0],
-								 [0]])
-		
-		self.E_initial = matrix([[100,   0,   0,   0,   0,   0],
+	def _getEInitialMatrix():
+		return matrix([[100,   0,   0,   0,   0,   0],
 								 [  0, 0.1,   0,   0,   0,   0],
 								 [  0,   0, 0.1,   0,   0,   0],
 								 [  0,   0,   0, 100,   0,   0],
 								 [  0,   0,   0,   0, 0.1,   0],
 								 [  0,   0,   0,   0,   0, 0.1]])
+	
+	def _getUInitialMatrix():
+		return matrix([[0],
+								 [0],
+								 [0],
+								 [0],
+								 [0],
+								 [0]])
+	def __init__(self, noise):
+		#initial values
+		self.reset()
 		
 		#constant values
 		self.E_x = matrix([[0.1,   0, 0,   0,   0, 0],
@@ -35,27 +38,12 @@ class KalmanFilter():
 						   [	   0, noise**2]])
 		
 	def reset(self):
-		self.u_initial = matrix([[0],
-								 [0],
-								 [0],
-								 [0],
-								 [0],
-								 [0]])
+		self.u_initial = self._getUInitialMatrix()
 		
-		self.E_initial = matrix([[100,   0,   0,   0,   0,   0],
-								 [  0, 0.1,   0,   0,   0,   0],
-								 [  0,   0, 0.1,   0,   0,   0],
-								 [  0,   0,   0, 100,   0,   0],
-								 [  0,   0,   0,   0, 0.1,   0],
-								 [  0,   0,   0,   0,   0, 0.1]])
+		self.E_initial = self._getEInitialMatrix()
 
 	def update(self, Z_next, Delta_t):
-		F = matrix([[1, Delta_t, Delta_t**2/2, 0,		0,			  0],
-					[0,	      1,      Delta_t, 0,		0,			  0],
-					[0,	      0,			1, 0,		0,			  0],
-					[0,	      0,			0, 1, Delta_t, Delta_t**2/2],
-					[0,	      0,			0, 0,		1,		Delta_t],
-					[0,	      0,			0, 0,		0,			  1]])
+		F = self._getFMatrix(Delta_t)
 		
 		FEinitFtrans_plus_Ex = (F * self.E_initial * F.getT()) + self.E_x
 		Hportion = self.H * FEinitFtrans_plus_Ex * self.H.getT() + self.E_z
@@ -76,13 +64,15 @@ class KalmanFilter():
 		position = (m[0,0], m[0,1])
 		return position
 		
-	def get_target(self, Delta_t):
-		F = matrix([[1, Delta_t, Delta_t**2/2, 0,		0,			  0],
+	def _getFMatrix(self, Delta_t):
+		return matrix([[1, Delta_t, Delta_t**2/2, 0,		0,			  0],
 					[0,	      1,      Delta_t, 0,		0,			  0],
 					[0,	      0,			1, 0,		0,			  0],
 					[0,	      0,			0, 1, Delta_t, Delta_t**2/2],
 					[0,	      0,			0, 0,		1,		Delta_t],
 					[0,	      0,			0, 0,		0,			  1]])
+	def get_target(self, Delta_t):
+		F = self._getFMatrix(Delta_t)
 		
 		u_next = F * self.u_initial
 		m = self.H * u_next
