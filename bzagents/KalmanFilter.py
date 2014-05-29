@@ -7,55 +7,55 @@ class KalmanFilter():
 	def __init__(self, noise):
 		#initial values
 		self.u_initial = matrix([[0],
-					 [0],
-					 [0],
-					 [0],
-					 [0],
-					 [0]])
+								 [0],
+								 [0],
+								 [0],
+								 [0],
+								 [0]])
 		
 		self.E_initial = matrix([[100,   0,   0,   0,   0,   0],
-					 [  0, 0.1,   0,   0,   0,   0],
-					 [  0,   0, 0.1,   0,   0,   0],
-					 [  0,   0,   0, 100,   0,   0],
-					 [  0,   0,   0,   0, 0.1,   0],
-					 [  0,   0,   0,   0,   0, 0.1]])
+								 [  0, 0.1,   0,   0,   0,   0],
+								 [  0,   0, 0.1,   0,   0,   0],
+								 [  0,   0,   0, 100,   0,   0],
+								 [  0,   0,   0,   0, 0.1,   0],
+								 [  0,   0,   0,   0,   0, 0.1]])
 		
 		#constant values
 		self.E_x = matrix([[0.1,   0, 0,   0,   0, 0],
-				   [  0, 0.1, 0,   0,   0, 0],
-				   [  0,   0, 1,   0,   0, 0],
-				   [  0,   0, 0, 0.1,   0, 0],
-				   [  0,   0, 0,   0, 0.1, 0],
-				   [  0,   0, 0,   0,   0, 1]])
+						   [  0, 0.1, 0,   0,   0, 0],
+						   [  0,   0, 1,   0,   0, 0],
+						   [  0,   0, 0, 0.1,   0, 0],
+						   [  0,   0, 0,   0, 0.1, 0],
+						   [  0,   0, 0,   0,   0, 1]])
 		
 		self.H = matrix([[1.0, 0, 0,   0, 0, 0], 
-				 [  0, 0, 0, 1.0, 0, 0]])
+						 [  0, 0, 0, 1.0, 0, 0]])
 		
 		self.E_z = matrix([[noise**2,	     0], 
-				   [	   0, noise**2]])
+						   [	   0, noise**2]])
 		
 	def reset(self):
 		self.u_initial = matrix([[0],
-					 [0],
-					 [0],
-					 [0],
-					 [0],
-					 [0]])
+								 [0],
+								 [0],
+								 [0],
+								 [0],
+								 [0]])
 		
 		self.E_initial = matrix([[100,   0,   0,   0,   0,   0],
-					 [  0, 0.1,   0,   0,   0,   0],
-					 [  0,   0, 0.1,   0,   0,   0],
-					 [  0,   0,   0, 100,   0,   0],
-					 [  0,   0,   0,   0, 0.1,   0],
-					 [  0,   0,   0,   0,   0, 0.1]])
+								 [  0, 0.1,   0,   0,   0,   0],
+								 [  0,   0, 0.1,   0,   0,   0],
+								 [  0,   0,   0, 100,   0,   0],
+								 [  0,   0,   0,   0, 0.1,   0],
+								 [  0,   0,   0,   0,   0, 0.1]])
 
 	def update(self, Z_next, Delta_t):
-		F = matrix([[1, Delta_t, Delta_t**2/2, 0,	0,	      0],
-			    [0	      1,      Delta_t, 0,	0,	      0],
-			    [0,	      0,	    1, 0,	0,	      0],
-			    [0,	      0,	    0, 1, Delta_t, Delta_t**2/2],
-			    [0,	      0,	    0, 0,	1,	Delta_t],
-			    [0,	      0,	    0, 0, 	0, 	      1]])
+		F = matrix([[1, Delta_t, Delta_t**2/2, 0,		0,			  0],
+					[0,	      1,      Delta_t, 0,		0,			  0],
+					[0,	      0,			1, 0,		0,			  0],
+					[0,	      0,			0, 1, Delta_t, Delta_t**2/2],
+					[0,	      0,			0, 0,		1,		Delta_t],
+					[0,	      0,			0, 0,		0,			  1]])
 		
 		FEinitFtrans_plus_Ex = (F * self.E_initial * F.getT()) + self.E_x
 		Hportion = self.H * FEinitFtrans_plus_Ex * self.H.getT() + self.E_z
@@ -70,3 +70,23 @@ class KalmanFilter():
 		
 		self.u_initial = u_next
 		self.E_initial = E_next
+		
+	def get_enemy_position(self):
+		m = self.H * self.u_initial
+		position = (m[0,0], m[0,1])
+		return position
+		
+	def get_target(self, Delta_t):
+		F = matrix([[1, Delta_t, Delta_t**2/2, 0,		0,			  0],
+					[0,	      1,      Delta_t, 0,		0,			  0],
+					[0,	      0,			1, 0,		0,			  0],
+					[0,	      0,			0, 1, Delta_t, Delta_t**2/2],
+					[0,	      0,			0, 0,		1,		Delta_t],
+					[0,	      0,			0, 0,		0,			  1]])
+		
+		u_next = F * self.u_initial
+		m = self.H * u_next
+		position = (m[0,0], m[0,1])
+		return position
+		
+		
