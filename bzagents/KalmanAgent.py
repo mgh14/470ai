@@ -54,7 +54,7 @@ class KalmanAgent(PFAgent):
 		distance = self.distance(self.target, (tank_x, tank_y))
 		target_angle = self.getAdjustedAngle(math.atan2(target_y - tank_y,target_x - tank_x))
 		relative_angle = self.getAdjustedAngle(target_angle - tank_angle)
-		if abs(relative_angle) <= .005 and alive:
+		if relative_angle <= .005 and alive:
 			self.commandAgent("shoot " + tank_index)
 		self.commandAgent("angvel " + str(tank_index) + " " + str(relative_angle))
 		
