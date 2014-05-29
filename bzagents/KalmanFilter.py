@@ -4,21 +4,6 @@ from numpy import matrix, identity
 
 class KalmanFilter():
 	
-	def _getEInitialMatrix():
-		return matrix([[100,   0,   0,   0,   0,   0],
-								 [  0, 0.1,   0,   0,   0,   0],
-								 [  0,   0, 0.1,   0,   0,   0],
-								 [  0,   0,   0, 100,   0,   0],
-								 [  0,   0,   0,   0, 0.1,   0],
-								 [  0,   0,   0,   0,   0, 0.1]])
-	
-	def _getUInitialMatrix():
-		return matrix([[0],
-								 [0],
-								 [0],
-								 [0],
-								 [0],
-								 [0]])
 	def __init__(self, noise):
 		#initial values
 		self.reset()
@@ -37,6 +22,30 @@ class KalmanFilter():
 		self.E_z = matrix([[noise**2,	     0], 
 						   [	   0, noise**2]])
 		
+	def _getEInitialMatrix():
+		return matrix([[100,   0,   0,   0,   0,   0],
+								 [  0, 0.1,   0,   0,   0,   0],
+								 [  0,   0, 0.1,   0,   0,   0],
+								 [  0,   0,   0, 100,   0,   0],
+								 [  0,   0,   0,   0, 0.1,   0],
+								 [  0,   0,   0,   0,   0, 0.1]])
+	
+	def _getUInitialMatrix():
+		return matrix([[0],
+								 [0],
+								 [0],
+								 [0],
+								 [0],
+								 [0]])
+
+	def _getFMatrix(self, Delta_t):
+		return matrix([[1, Delta_t, Delta_t**2/2, 0,		0,			  0],
+					[0,	      1,      Delta_t, 0,		0,			  0],
+					[0,	      0,			1, 0,		0,			  0],
+					[0,	      0,			0, 1, Delta_t, Delta_t**2/2],
+					[0,	      0,			0, 0,		1,		Delta_t],
+					[0,	      0,			0, 0,		0,			  1]])
+
 	def reset(self):
 		self.u_initial = self._getUInitialMatrix()
 		
@@ -64,13 +73,6 @@ class KalmanFilter():
 		position = (m[0,0], m[0,1])
 		return position
 		
-	def _getFMatrix(self, Delta_t):
-		return matrix([[1, Delta_t, Delta_t**2/2, 0,		0,			  0],
-					[0,	      1,      Delta_t, 0,		0,			  0],
-					[0,	      0,			1, 0,		0,			  0],
-					[0,	      0,			0, 1, Delta_t, Delta_t**2/2],
-					[0,	      0,			0, 0,		1,		Delta_t],
-					[0,	      0,			0, 0,		0,			  1]])
 	def get_target(self, Delta_t):
 		F = self._getFMatrix(Delta_t)
 		
