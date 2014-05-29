@@ -16,8 +16,6 @@ class KalmanAgent(PFAgent):
 		Agent.__init__(self, ip, port)
 		self._initializePF()
 		
-		self.commands = []
-		
 		# world details
 		self.shot_speed = float(self.constants['shotspeed'])
 		
@@ -58,9 +56,7 @@ class KalmanAgent(PFAgent):
 		relative_angle = self.getAdjustedAngle(target_angle - tank_angle)
 		if abs(relative_angle) <= .005 and alive:
 			self.commandAgent("shoot " + tank_index)
-		#set a command to adjust angvel of tank
-		angvel = relative_angle
-		self.commands.append("angvel " + str(tank_index) + " " + str(angvel))
+		self.commandAgent("angvel " + str(tank_index) + " " + str(relative_angle))
 		
 	def distance(self, a , b):
 		return math.sqrt((b[1]-a[1])**2+(b[0]-a[0])**2)
@@ -93,12 +89,5 @@ class KalmanAgent(PFAgent):
 				self.delta = 0.0
 			
 			for tank in myTanksInfo:
-
 				self.tank_controller(tank)
-			
-			#perform any saved commands
-			for command in self.commands:
-				self.commandAgent(command)
-				print command
-			commands = []
 		
