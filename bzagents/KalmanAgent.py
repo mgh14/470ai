@@ -50,26 +50,17 @@ class KalmanAgent(PFAgent):
 		tank_index = tank[0]
 		tank_x = int(tank[6])
 		tank_y = int(tank[7])
-		tank_angle = float(tank[8])
+		tank_angle = self.getAdjustedAngle(float(tank[8]))
 		
 		target_x, target_y, alive = self.target
 		distance = self.distance(self.target, (tank_x, tank_y))
-		target_angle = math.atan2(target_y - tank_y,target_x - tank_x)
-		relative_angle = self.normalize_angle(target_angle - tank_angle)
+		target_angle = self.getAdjustedAngle(math.atan2(target_y - tank_y,target_x - tank_x))
+		relative_angle = self.getAdjustedAngle(target_angle - tank_angle)
 		if abs(relative_angle) <= .005 and alive:
 			self.commandAgent("shoot " + tank_index)
 		#set a command to adjust angvel of tank
-		angvel = relative_angle*(distance/50)
+		angvel = relative_angle
 		self.commands.append("angvel " + str(tank_index) + " " + str(angvel))
-		
-	def normalize_angle(self, angle):
-		"""Make any angle be between +/- pi."""
-		angle -= 2 * math.pi * int (angle / (2 * math.pi))
-		if angle <= -math.pi:
-			angle += 2 * math.pi
-		elif angle > math.pi:
-			angle -= 2 * math.pi
-		return angle
 		
 	def distance(self, a , b):
 		return math.sqrt((b[1]-a[1])**2+(b[0]-a[0])**2)
