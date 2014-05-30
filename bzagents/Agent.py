@@ -186,15 +186,43 @@ class Agent(object):
 
 	def _getCurrentPositionOfTank(self,tankNum):
 		tankInfo = self._query("mytanks")[tankNum]
-		return [float(tankInfo[6]),float(tankInfo[7])]
+		return self.getAdjustedPoint([float(tankInfo[6]),float(tankInfo[7])])
 
 	def distance(self, a , b):
 		return math.sqrt((b[1]-a[1])**2+(b[0]-a[0])**2)
 
+	def getDesiredAngle(self, tankNum,pointToVisit):
+		currentPosition = self._getCurrentPositionOfTank(tankNum)
+		return self.getAdjustedAngle(math.atan2(pointToVisit[1]-currentPosition[1],
+								pointToVisit[0]-currentPosition[0]))
+
+	def setAngularVelocity(self, tankNum, angVel, pointToVisit):
+		desiredAngle = self.getDesiredAngle(tankNum,pointToVisit)
+
+		tankInfo = self._query("mytanks")[tankNum]
+		currAngle = self.getAdjustedAngle(tankInfo[8])
+		absAngVel = abs(angVel)
+
+		# figure out which way the tank should turn
+		if(desiredAngle - currAngle > 0):
+			if(desiredAngle - math.pi > currAngle):
+				angVel = -1 * absAngVel
+			else:
+				angVel = absAngVel
+		else:
+			if(desiredAngle + math.pi > currAngle):
+				angVel = -1 * absAngVel
+			else:
+				angVel = absAngVel
+
+		self.commandAgent("angvel " + str(tankNum) + " " + str(angVel))
+
 	def getAdjustedAngle(self,rawAngle):
+		rawAngle = float(rawAngle)
+
 		twoPi = 2*math.pi
 		if(rawAngle > twoPi):
-			rawAngle = math.fmod(rawAngle,twoPi)
+			return math.fmod(rawAngle,twoPi)
 
 		if(rawAngle >= 0) and (rawAngle < math.pi):
 			return rawAngle
