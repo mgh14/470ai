@@ -57,10 +57,6 @@ class KalmanAgent(PFAgent):
 		if relative_angle <= .005 and alive:
 			self.commandAgent("shoot " + tank_index)
 		self.commandAgent("angvel " + str(tank_index) + " " + str(relative_angle))
-		
-	def distance(self, a , b):
-		return math.sqrt((b[1]-a[1])**2+(b[0]-a[0])**2)
-
 
 	def play(self):
 

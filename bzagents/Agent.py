@@ -184,6 +184,13 @@ class Agent(object):
 
 		return False
 
+	def _getCurrentPositionOfTank(self,tankNum):
+		tankInfo = self._query("mytanks")[tankNum]
+		return [float(tankInfo[6]),float(tankInfo[7])]
+
+	def distance(self, a , b):
+		return math.sqrt((b[1]-a[1])**2+(b[0]-a[0])**2)
+
 	def getAdjustedAngle(self,rawAngle):
 		twoPi = 2*math.pi
 		if(rawAngle > twoPi):
