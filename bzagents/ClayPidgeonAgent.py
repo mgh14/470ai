@@ -17,7 +17,7 @@ class ClayPidgeonAgent(Agent):
 		myTanks = self._query("mytanks")
 		tank0 = myTanks[self.tankNum]
 		angVel = 0.2
-		while (self.getAdjustedAngle(float(tank0[8])) - math.pi > .005):
+		while (abs(self.getAdjustedAngle(float(tank0[8])) - math.pi) > .005):
 			self.commandAgent("angvel " + str(self.tankNum) + " " + str(angVel))
 			tank0 = self._query("mytanks")[self.tankNum]
 		
@@ -25,6 +25,8 @@ class ClayPidgeonAgent(Agent):
 		self.commandAgent("angvel " + str(self.tankNum) + " 0")
 
 	def play(self):
+		#self._moveToPosition
+		#sys.exit(0)
 		self._alignTankWithAngle()
 
 		velocity = self.velocity
