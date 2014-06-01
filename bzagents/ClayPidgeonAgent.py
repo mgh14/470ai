@@ -9,7 +9,7 @@ class ClayPidgeonAgent(Agent):
 		self.tankNum = 0
 		self.velocity = 0.75
 		self.oscillationThreshold = 40	# (in seconds)
-		self.oscillationAngle = math.pi
+		self.oscillationAngle = 0
 
 	def _alignTankWithAngle(self):
 		# desired angle along which the tank will move in a straight line
@@ -30,8 +30,7 @@ class ClayPidgeonAgent(Agent):
 
 		# rotate to move up
 		angleDiff = abs(self.getMyAngle(self.tankNum) - perpAngle)
-		while(angleDiff > .005):
-			print "diff: " + str(angleDiff) + "; myAng: " + str(self.getMyAngle(self.tankNum))
+		while(angleDiff > .001):
 			self.setAngularVelocity(0,.3,perpAngle)
 			angleDiff = abs(self.getMyAngle(self.tankNum) - perpAngle)
 
@@ -40,7 +39,7 @@ class ClayPidgeonAgent(Agent):
 		# move up n units
 		originalPosition = self.getMyPosition(0)
 		position = originalPosition
-		while(position[1] - originalPosition[1] < 100):
+		while(abs(position[1] - originalPosition[1]) < 100):
 			self.commandAgent("speed " + str(self.tankNum) + " .3")
 			position = self.getMyPosition(0)
 
