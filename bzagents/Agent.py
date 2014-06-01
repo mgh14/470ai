@@ -77,10 +77,12 @@ class Agent(object):
 				self.myFlagStand = [int(float(flag[2])),int(float(flag[3]))]
 
 	def commandAgent(self, command):
-		print "Cmd: " + command
+		#print "Cmd: " + command
 		self.socket.write(command + self.SERVER_DELIMITER)
-		print "ResponseL1: " + self.socket.read_until(self.SERVER_DELIMITER).rstrip()
-		print "ResponseL2: " + self.socket.read_until(self.SERVER_DELIMITER)
+		responseLine1 = self.socket.read_until(self.SERVER_DELIMITER).rstrip()
+		responseLine2 = self.socket.read_until(self.SERVER_DELIMITER)
+		#print "ResponseL1: " + responseLine1
+		#print "ResponseL2: " + responseLine2
 
 	def stop(self, tankNum):
 		self.commandAgent("speed " + str(tankNum) + " 0")
@@ -90,10 +92,8 @@ class Agent(object):
 
 	# for game queries
 	def _query(self, queryCommand):
-		#print "query: " + query
 		self.socket.write(queryCommand + self.SERVER_DELIMITER)
 		response = self.socket.read_until(self.SERVER_DELIMITER).rstrip();
-		#print "ResponseL1: " + response
 
 		stringList = self.socket.read_until(self.LIST_END)
 
