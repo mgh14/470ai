@@ -1,8 +1,11 @@
 import math
 from numpy import matrix, identity
+from tankUtil import *
 
 
 class KalmanFilter():
+
+	worldHalfSize = 400
 	
 	def __init__(self, noise):
 		#initial values
@@ -22,7 +25,7 @@ class KalmanFilter():
 		self.E_z = matrix([[noise**2,	     0], 
 						   [	   0, noise**2]])
 		
-	def _getEInitialMatrix():
+	def _getEInitialMatrix(self):
 		return matrix([[100,   0,   0,   0,   0,   0],
 								 [  0, 0.1,   0,   0,   0,   0],
 								 [  0,   0, 0.1,   0,   0,   0],
@@ -30,7 +33,7 @@ class KalmanFilter():
 								 [  0,   0,   0,   0, 0.1,   0],
 								 [  0,   0,   0,   0,   0, 0.1]])
 	
-	def _getUInitialMatrix():
+	def _getUInitialMatrix(self):
 		return matrix([[0],
 								 [0],
 								 [0],
@@ -70,7 +73,7 @@ class KalmanFilter():
 		
 	def get_enemy_position(self):
 		m = self.H * self.u_initial
-		position = (m[0,0], m[0,1])
+		position = getAdjustedPoint([m[0,0], m[0,1]],self.worldHalfSize)
 		return position
 		
 	def get_target(self, Delta_t):

@@ -11,6 +11,8 @@ class KalmanAgent(PFAgent):
 	# Member Constants
 	WAIT = .2 #wait time between filter updates
 	NOISE = 5 #noise for filter, The lab makes it sound like it should be set to 5
+	TANK_NUM = 0
+	ANG_VEL = .3
 	
 	def __init__(self, ip, port):
 		Agent.__init__(self, ip, port)
@@ -27,10 +29,12 @@ class KalmanAgent(PFAgent):
 	def get_new_target(self, enemy, me):
 		# Insert kalman filter here
 		enemy_status = enemy[2]
-		enemy_x = float(enemy[4])
-		enemy_y = float(enemy[5])
-		me_x = int(me[6])
-		me_y = int(me[7])
+		enemyPosition = self.getAdjustedPoint([float(enemy[4]),float(enemy[5])])
+		enemy_x = enemyPosition[0]
+		enemy_y = enemyPosition[1]
+		myPosition = self.getAdjustedPoint([int(me[6]),int(me[7])])
+		me_x = myPosition[0]
+		me_y = myPosition[1]
 		
 		if enemy_status == 'alive':
 			self.kalmanFilter.update((enemy_x, enemy_y), self.delta)
@@ -45,22 +49,19 @@ class KalmanAgent(PFAgent):
 			self.target = (x, y, False)
 			
 	def tank_controller(self, tank):
-		tank_index = tank[0]
-		tank_x = int(tank[6])
-		tank_y = int(tank[7])
+		tankPoint = self.getAdjustedPoint([int(tank[6]),int(tank[7])])
+		tank_x = tankPoint[0]
+		tank_y = tankPoint[1]
 		tank_angle = self.getAdjustedAngle(float(tank[8]))
 		
 		target_x, target_y, alive = self.target
 		distance = self.distance(self.target, (tank_x, tank_y))
 		target_angle = self.getAdjustedAngle(math.atan2(target_y - tank_y,target_x - tank_x))
-		relative_angle = self.getAdjustedAngle(target_angle - tank_angle)
+		relative_angle = abs(self.getAdjustedAngle(target_angle - tank_angle))
 		if relative_angle <= .005 and alive:
-			self.commandAgent("shoot " + tank_index)
-		self.commandAgent("angvel " + str(tank_index) + " " + str(relative_angle))
-		
-	def distance(self, a , b):
-		return math.sqrt((b[1]-a[1])**2+(b[0]-a[0])**2)
-
+			self.commandAgent("shoot " + str(self.TANK_NUM))
+		#self.commandAgent("angvel " + str(self.TANK_NUM) + " " + str(relative_angle))
+		self.setAngularVelocityByPoint(self.TANK_NUM, self.ANG_VEL,[target_x,target_y])
 
 	def play(self):
 
@@ -81,7 +82,7 @@ class KalmanAgent(PFAgent):
 			otherTanksInfo = self._query("othertanks")
 			#flagsInfo = self._query("flags")
 			target = otherTanksInfo[0]
-			me = myTanksInfo[0]
+			me = myTanksInfo[self.TANK_NUM]
 			#self.kalmanFilter.update((target.x, target.y), time_diff)
 			if self.delta >= self.WAIT:
 			

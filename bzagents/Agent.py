@@ -5,6 +5,8 @@ import random
 import math
 import GnuplotUtil
 
+from tankUtil import *
+
 class Agent(object):
 	# constants	
 	SERVER_DELIMITER = "\n"
@@ -77,20 +79,21 @@ class Agent(object):
 	def commandAgent(self, command):
 		#print "Cmd: " + command
 		self.socket.write(command + self.SERVER_DELIMITER)
-		#print "ResponseL1: " + 
-		self.socket.read_until(self.SERVER_DELIMITER).rstrip()
-		#print "ResponseL2: " + 
-		self.socket.read_until(self.SERVER_DELIMITER)
+		responseLine1 = self.socket.read_until(self.SERVER_DELIMITER).rstrip()
+		responseLine2 = self.socket.read_until(self.SERVER_DELIMITER)
+		#print "ResponseL1: " + responseLine1
+		#print "ResponseL2: " + responseLine2
+
+	def stop(self, tankNum):
+		self.commandAgent("speed " + str(tankNum) + " 0")
 
 	def closeSocket(self):
 		self.socket.close()
 
 	# for game queries
 	def _query(self, queryCommand):
-		#print "query: " + query
 		self.socket.write(queryCommand + self.SERVER_DELIMITER)
 		response = self.socket.read_until(self.SERVER_DELIMITER).rstrip();
-		#print "ResponseL1: " + response
 
 		stringList = self.socket.read_until(self.LIST_END)
 
@@ -186,10 +189,46 @@ class Agent(object):
 
 		return False
 
+	def _getCurrentPositionOfTank(self,tankNum):
+		tankInfo = self._query("mytanks")[tankNum]
+		return self.getAdjustedPoint([float(tankInfo[6]),float(tankInfo[7])])
+
+	def distance(self, a , b):
+		return math.sqrt((b[1]-a[1])**2+(b[0]-a[0])**2)
+
+	def getDesiredAngle(self, tankNum, pointToVisit):
+		currentPosition = self._getCurrentPositionOfTank(tankNum)
+		return self.getAdjustedAngle(math.atan2(pointToVisit[1]-currentPosition[1],
+								pointToVisit[0]-currentPosition[0]))
+
+	def setAngularVelocity(self, tankNum, angVel, desiredAngle):
+		tankInfo = self._query("mytanks")[tankNum]
+		currAngle = self.getAdjustedAngle(tankInfo[8])
+		absAngVel = abs(angVel)
+
+		# figure out which way the tank should turn
+		if(desiredAngle - currAngle > 0):
+			if(desiredAngle - math.pi > currAngle):
+				angVel = -1 * absAngVel
+			else:
+				angVel = absAngVel
+		else:
+			if(desiredAngle + math.pi > currAngle):
+				angVel = -1 * absAngVel
+			else:
+				angVel = absAngVel
+
+		self.commandAgent("angvel " + str(tankNum) + " " + str(angVel))
+
+	def setAngularVelocityByPoint(self, tankNum, angVel, pointToVisit):
+		self.setAngularVelocity(tankNum, angVel, self.getDesiredAngle(tankNum,pointToVisit))
+		
 	def getAdjustedAngle(self,rawAngle):
+		rawAngle = float(rawAngle)
+
 		twoPi = 2*math.pi
 		if(rawAngle > twoPi):
-			rawAngle = math.fmod(rawAngle,twoPi)
+			return math.fmod(rawAngle,twoPi)
 
 		if(rawAngle >= 0) and (rawAngle < math.pi):
 			return rawAngle
@@ -200,6 +239,18 @@ class Agent(object):
 
 	def getAdjustedPoint(self,point):
 		return [self.worldHalfSize + point[0],self.worldHalfSize + point[1]]
+
+	def getMyPosition(self, tankNum):
+		mytanks = self._query("mytanks")
+		tankInfo = mytanks[tankNum]
+
+		return [float(tankInfo[6]),float(tankInfo[7])]
+
+	def getMyAngle(self, tankNum):
+		mytanks = self._query("mytanks")
+		tankInfo = mytanks[tankNum]
+
+		return float(tankInfo[8])
 
 	def play(self):		# driver function for beginning AI simulation
 		print "no implemented play method: tanks will just sit."
