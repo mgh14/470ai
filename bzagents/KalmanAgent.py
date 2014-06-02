@@ -52,7 +52,7 @@ class KalmanAgent(PFAgent):
 			self.kalmanFilter.reset()
 			self.target = (x, y, False)
 			
-	def tank_controller(self, tank):
+	def tank_controller(self, tank, counter, threshold):
 		tankPoint = self.getAdjustedPoint([int(tank[6]),int(tank[7])])
 		tank_x = tankPoint[0]
 		tank_y = tankPoint[1]
@@ -64,7 +64,7 @@ class KalmanAgent(PFAgent):
 		relative_angle = abs(target_angle - tank_angle)
 
 
-		if(counter > threshold):
+		if(counter == threshold):
 			otherTank = self._query("othertanks")[0]
 			hisPosition = self.getAdjustedPoint([float(otherTank[4]),float(otherTank[5])])
 			print "\nhisPos: " + str(hisPosition)
@@ -93,7 +93,8 @@ class KalmanAgent(PFAgent):
 
 		prev_time = time.time()
 
-	
+		counter = 0
+		threshold = 150
 		while True:
 		
 			now = time.time()
@@ -115,6 +116,7 @@ class KalmanAgent(PFAgent):
 				self.get_new_target(target, me)
 				self.delta = 0.0
 			
-			for tank in myTanksInfo:
-				self.tank_controller(tank)
-		
+			self.tank_controller(myTanksInfo[self.TANK_NUM],counter, threshold)
+			counter += 1
+			if(counter > threshold):
+				counter = 0
