@@ -75,10 +75,12 @@ class Agent(object):
 				self.myFlagStand = [int(float(flag[2])),int(float(flag[3]))]
 
 	def commandAgent(self, command):
-		print "Cmd: " + command
+		#print "Cmd: " + command
 		self.socket.write(command + self.SERVER_DELIMITER)
-		print "ResponseL1: " + self.socket.read_until(self.SERVER_DELIMITER).rstrip()
-		print "ResponseL2: " + self.socket.read_until(self.SERVER_DELIMITER)
+		#print "ResponseL1: " + 
+		self.socket.read_until(self.SERVER_DELIMITER).rstrip()
+		#print "ResponseL2: " + 
+		self.socket.read_until(self.SERVER_DELIMITER)
 
 	def closeSocket(self):
 		self.socket.close()
