@@ -7,31 +7,38 @@ class ClayPidgeonAgent(Agent):
 		Agent.__init__(self,ip,port)
 
 		self.tankNum = 0
-		self.velocity = .5
+		self.velocity = .8
 		self.angVel = .3
 		self.oscillationThreshold = 40	# (in seconds)
-		self.oscillationAngle = 0
+		#self.oscillationAngle = (float(3)/2)*math.pi   # y-axis oscillation
+		self.oscillationAngle = 0   # x-axis oscillation
 
 	def _alignTankWithAngle(self):
-		# desired angle along which the tank will move in a straight line
-		movementAngle = 0
-
-		myTanks = self._query("mytanks")
-		tank0 = myTanks[self.tankNum]
-		while (abs(self.getAdjustedAngle(float(tank0[8])) - self.oscillationAngle) > .001):
-			self.setAngularVelocity(0,self.angVel,movementAngle)
-			tank0 = self._query("mytanks")[self.tankNum]
+		tank = self._query("mytanks")[self.tankNum]
+		relAngle = abs(self.getMyAngle(self.tankNum) - self.oscillationAngle)
+		while (relAngle > .001):
+			speed = relAngle/math.pi
+			if(speed < .15):
+				speed = .15
+	
+			# reassign variables
+			self.setAngularVelocity(0,speed,self.oscillationAngle)
+			relAngle = abs(self.getMyAngle(0) - self.oscillationAngle)
 		
 		# stop tank rotation
 		self.stop(0)
 
 	def _moveToParallelPlane(self):
 		perpAngle = self.getAdjustedAngle(self.oscillationAngle + math.pi/2)
-
-		# rotate to move up
+		# rotate to move (perpendicular to plane of oscillation)
 		angleDiff = abs(self.getMyAngle(self.tankNum) - perpAngle)
 		while(angleDiff > .001):
-			self.setAngularVelocity(0,self.angVel,perpAngle)
+			speed = angleDiff/math.pi
+			if(speed < .15):
+				speed = .15
+
+			# reassign variables
+			self.setAngularVelocity(0,speed,perpAngle)
 			angleDiff = abs(self.getMyAngle(self.tankNum) - perpAngle)
 
 		self.setAngularVelocity(0,0,perpAngle)
@@ -39,8 +46,8 @@ class ClayPidgeonAgent(Agent):
 		# move up n units
 		originalPosition = self.getMyPosition(0)
 		position = originalPosition
-		distanceFromEnemyPlane = 150
-		while(abs(position[1] - originalPosition[1]) < distanceFromEnemyPlane):
+		distanceFromEnemyPlane = 200
+		while(self.distance(originalPosition, position) < distanceFromEnemyPlane):
 			self.commandAgent("speed " + str(self.tankNum) + " " + str(self.velocity))
 			position = self.getMyPosition(0)
 
