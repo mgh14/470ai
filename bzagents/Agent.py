@@ -85,6 +85,7 @@ class Agent(object):
 		#print "ResponseL2: " + responseLine2
 
 	def stop(self, tankNum):
+		self.commandAgent("angvel " + str(tankNum) + " 0")
 		self.commandAgent("speed " + str(tankNum) + " 0")
 
 	def closeSocket(self):

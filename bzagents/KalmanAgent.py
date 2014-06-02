@@ -13,6 +13,7 @@ class KalmanAgent(PFAgent):
 	NOISE = 5 #noise for filter, The lab makes it sound like it should be set to 5
 	TANK_NUM = 0
 	ANG_VEL = .3
+
 	#used for visualization
 	predictionGrid = []
 	
@@ -36,17 +37,12 @@ class KalmanAgent(PFAgent):
 		# Insert kalman filter here
 		enemy_status = enemy[2]
 		enemyPosition = self.getAdjustedPoint([float(enemy[4]),float(enemy[5])])
-		enemy_x = enemyPosition[0]
-		enemy_y = enemyPosition[1]
 		myPosition = self.getAdjustedPoint([int(me[6]),int(me[7])])
-		me_x = myPosition[0]
-		me_y = myPosition[1]
 		
 		if enemy_status == 'alive':
-			self.kalmanFilter.update((enemy_x, enemy_y), self.delta)
+			self.kalmanFilter.update((enemyPosition[0], enemyPosition[1]), self.delta)
 			x, y = self.kalmanFilter.get_enemy_position()
-			delta_t = 10 * self.shot_speed / self.distance((me_x, me_y), (x, y))
-			#print delta_t
+			delta_t = self.distance(myPosition, (x, y)) / self.shot_speed
 			x, y = self.kalmanFilter.get_target(delta_t)
 			self.drawPredictionGrid(x,y)
 			self.target = (x, y, True)
@@ -63,23 +59,29 @@ class KalmanAgent(PFAgent):
 		tank_angle = self.getAdjustedAngle(float(tank[8]))
 		
 		target_x, target_y, alive = self.target
-		distance = self.distance(self.target, (tank_x, tank_y))
-		target_angle = self.getAdjustedAngle(math.atan2(target_y - tank_y,target_x - tank_x))
-		relative_angle = abs(self.getAdjustedAngle(target_angle - tank_angle))
-		if relative_angle <= .005 and alive:
+		distance = self.distance(self.target, (tankPoint[0], tankPoint[1]))
+		target_angle = self.getAdjustedAngle(math.atan2(target_y - tankPoint[1],target_x - tankPoint[0]))
+		relative_angle = abs(target_angle - tank_angle)
+
+
+		if(counter > threshold):
+			otherTank = self._query("othertanks")[0]
+			hisPosition = self.getAdjustedPoint([float(otherTank[4]),float(otherTank[5])])
+			print "\nhisPos: " + str(hisPosition)
+			print "target: " + str(self.target)
+			print "targAng: " + str(target_angle) + "; relAng: " + str(relative_angle) 
+		
+
+		if relative_angle <= .001 and alive:
+			print "shoot!"
 			self.commandAgent("shoot " + str(self.TANK_NUM))
-		#self.commandAgent("angvel " + str(self.TANK_NUM) + " " + str(relative_angle))
-		self.setAngularVelocityByPoint(self.TANK_NUM, self.ANG_VEL,[target_x,target_y])
+		
+		speed = relative_angle/math.pi
+		if(speed < .4):
+			speed = .4
+		self.setAngularVelocityByPoint(self.TANK_NUM, speed,[target_x,target_y])
 
 	def drawPredictionGrid(self,x,y):
-		if x >= self.worldHalfSize * 2:
-			x = self.worldHalfSize * 2 - 1
-		if y >= self.worldHalfSize * 2:
-			y = self.worldHalfSize * 2 - 1
-		if x < 0:
-			x = 0
-		if y < 0:
-			y = 0
 		self.predictionGrid[x][y] = 1 #visualization
 		update_grid(self.predictionGrid)
 		draw_grid()
