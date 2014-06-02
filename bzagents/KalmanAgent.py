@@ -12,7 +12,6 @@ class KalmanAgent(PFAgent):
 	WAIT = .2 #wait time between filter updates
 	NOISE = 5 #noise for filter, The lab makes it sound like it should be set to 5
 	TANK_NUM = 0
-	ANG_VEL = .2
 	
 	def __init__(self, ip, port):
 		Agent.__init__(self, ip, port)
@@ -36,7 +35,6 @@ class KalmanAgent(PFAgent):
 			self.kalmanFilter.update(enemyPosition, self.delta)
 			x, y = self.kalmanFilter.get_enemy_position()
 			delta_t = self.distance(myPosition, (x, y)) / self.shot_speed
-			#print delta_t
 			x, y = self.kalmanFilter.get_target(delta_t)
 			self.target = (x, y, True)
 		else:
@@ -55,6 +53,7 @@ class KalmanAgent(PFAgent):
 		target_angle = self.getAdjustedAngle(math.atan2(target_y - tank_y,target_x - tank_x))
 		relative_angle = abs(target_angle - tank_angle)
 
+
 		if(counter > threshold):
 			otherTank = self._query("othertanks")[0]
 			hisPosition = self.getAdjustedPoint([float(otherTank[4]),float(otherTank[5])])
@@ -63,12 +62,14 @@ class KalmanAgent(PFAgent):
 			print "targAng: " + str(target_angle) + "; relAng: " + str(relative_angle) 
 		
 
-
 		if relative_angle <= .001 and alive:
 			print "shoot!"
 			self.commandAgent("shoot " + str(self.TANK_NUM))
 		
-		self.setAngularVelocityByPoint(self.TANK_NUM, relative_angle,[target_x,target_y])
+		speed = relative_angle/math.pi
+		if(speed < .4):
+			speed = .4
+		self.setAngularVelocityByPoint(self.TANK_NUM, speed,[target_x,target_y])
 
 	def play(self):
 
