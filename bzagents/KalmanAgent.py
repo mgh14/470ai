@@ -82,6 +82,14 @@ class KalmanAgent(PFAgent):
 		self.setAngularVelocityByPoint(self.TANK_NUM, speed,[target_x,target_y])
 
 	def drawPredictionGrid(self,x,y):
+		if x >= self.worldHalfSize * 2:
+			x = self.worldHalfSize * 2 - 1
+		if y >= self.worldHalfSize * 2:
+			y = self.worldHalfSize * 2 - 1
+		if x < 0:
+			x = 0
+		if y < 0:
+			y = 0
 		self.predictionGrid[x][y] = 1 #visualization
 		update_grid(self.predictionGrid)
 		draw_grid()
