@@ -250,7 +250,7 @@ class Agent(object):
 		mytanks = self._query("mytanks")
 		tankInfo = mytanks[tankNum]
 
-		return float(tankInfo[8])
+		return self.getAdjustedAngle(float(tankInfo[8]))
 
 	def play(self):		# driver function for beginning AI simulation
 		print "no implemented play method: tanks will just sit."
