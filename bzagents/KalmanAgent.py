@@ -13,6 +13,8 @@ class KalmanAgent(PFAgent):
 	NOISE = 5 #noise for filter, The lab makes it sound like it should be set to 5
 	TANK_NUM = 0
 	ANG_VEL = .3
+	#used for visualization
+	predictionGrid = []
 	
 	def __init__(self, ip, port):
 		Agent.__init__(self, ip, port)
@@ -24,6 +26,10 @@ class KalmanAgent(PFAgent):
 		self.target = (0,0, False)
 		self.delta = 0.0
 		self.kalmanFilter = KalmanFilter(self.NOISE)
+		
+		#visualization init
+		init_window(self.worldHalfSize * 2, self.worldHalfSize * 2)
+		self.resetPredictionGrid()
 		
 		
 	def get_new_target(self, enemy, me):
@@ -42,8 +48,10 @@ class KalmanAgent(PFAgent):
 			delta_t = self.shot_speed / self.distance((me_x, me_y), (x, y))
 			#print delta_t
 			x, y = self.kalmanFilter.get_target(delta_t)
+			self.drawPredictionGrid(x,y)
 			self.target = (x, y, True)
 		else:
+			self.resetPredictionGrid()
 			x, y, t = self.target
 			self.kalmanFilter.reset()
 			self.target = (x, y, False)
@@ -63,6 +71,14 @@ class KalmanAgent(PFAgent):
 		#self.commandAgent("angvel " + str(self.TANK_NUM) + " " + str(relative_angle))
 		self.setAngularVelocityByPoint(self.TANK_NUM, self.ANG_VEL,[target_x,target_y])
 
+	def drawPredictionGrid(self,x,y):
+		self.predictionGrid[x][y] = 1 #visualization
+		update_grid(self.predictionGrid)
+		draw_grid()
+		
+	def resetPredictionGrid(self):
+		self.predictionGrid = zeros((self.worldHalfSize * 2, self.worldHalfSize * 2))
+	
 	def play(self):
 
 		prev_time = time.time()
