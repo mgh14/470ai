@@ -45,7 +45,7 @@ class KalmanAgent(PFAgent):
 		if enemy_status == 'alive':
 			self.kalmanFilter.update((enemy_x, enemy_y), self.delta)
 			x, y = self.kalmanFilter.get_enemy_position()
-			delta_t = self.shot_speed / self.distance((me_x, me_y), (x, y))
+			delta_t = 10 * self.shot_speed / self.distance((me_x, me_y), (x, y))
 			#print delta_t
 			x, y = self.kalmanFilter.get_target(delta_t)
 			self.drawPredictionGrid(x,y)
@@ -72,6 +72,14 @@ class KalmanAgent(PFAgent):
 		self.setAngularVelocityByPoint(self.TANK_NUM, self.ANG_VEL,[target_x,target_y])
 
 	def drawPredictionGrid(self,x,y):
+		if x >= self.worldHalfSize * 2:
+			x = self.worldHalfSize * 2 - 1
+		if y >= self.worldHalfSize * 2:
+			y = self.worldHalfSize * 2 - 1
+		if x < 0:
+			x = 0
+		if y < 0:
+			y = 0
 		self.predictionGrid[x][y] = 1 #visualization
 		update_grid(self.predictionGrid)
 		draw_grid()
