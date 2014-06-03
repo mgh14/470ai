@@ -28,12 +28,22 @@ class KalmanFilter():
 						   [	   0, noise**2]])
 		
 	def _getEInitialMatrix(self):
-		return matrix([[15,   0,   0,   0,   0,   0],
+		# best linear clay pidgeon results
+		'''return matrix([[15,   0,   0,   0,   0,   0],
 				[  0, 5,   0,   0,   0,   0],
 				[  0,   0, 5,   0,   0,   0],
 				[  0,   0,   0, 15,   0,   0],
 				[  0,   0,   0,   0, 5,   0],
-				[  0,   0,   0,   0,   0, 5]])
+				[  0,   0,   0,   0,   0, 5]])'''
+
+		# best orbital clay pidgeon results
+		return matrix([[15,   0,   0,   0,   0,   0],
+				[  0, 10,   0,   0,   0,   0],
+				[  0,   0, 20,   0,   0,   0],
+				[  0,   0,   0, 15,   0,   0],
+				[  0,   0,   0,   0, 10,   0],
+				[  0,   0,   0,   0,   0, 20]])
+
 	
 	def _getUInitialMatrix(self):
 		return matrix([[0],
