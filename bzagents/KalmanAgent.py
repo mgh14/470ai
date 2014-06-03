@@ -72,7 +72,8 @@ class KalmanAgent(PFAgent):
 		
 
 		#if relative_angle <= math.pi and alive:
-		if relative_angle <= .1 and alive:
+		angleTolerance = .001
+		if relative_angle <= angleTolerance and alive:
 			print "shoot!"
 			self.commandAgent("shoot " + str(self.TANK_NUM))
 		
