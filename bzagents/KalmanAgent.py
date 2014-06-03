@@ -21,7 +21,7 @@ class KalmanAgent(PFAgent):
 		PFAgent.__init__(self, ip, port)
 		
 		# world details
-		self.shot_speed = float(self.constants['shotspeed'])
+		self.SHOT_SPEED = float(self.constants['shotspeed'])
 		
 		self.target = (0,0, False)
 		self.delta = 0.0
@@ -41,7 +41,7 @@ class KalmanAgent(PFAgent):
 		if enemy_status == 'alive':
 			self.kalmanFilter.update((enemyPosition[0], enemyPosition[1]), self.delta)
 			x, y = self.kalmanFilter.get_enemy_position()
-			delta_t = self.distance(myPosition, (x, y)) / self.shot_speed
+			delta_t = self.distance(myPosition, (x, y)) / self.SHOT_SPEED
 			x, y = self.kalmanFilter.get_target(delta_t)
 			self.drawPredictionGrid(x,y)
 			self.target = (x, y, True)
@@ -77,8 +77,8 @@ class KalmanAgent(PFAgent):
 			self.commandAgent("shoot " + str(self.TANK_NUM))
 		
 		speed = relative_angle/math.pi
-		if(speed < .4):
-			speed = .4
+		if(speed < self.ANG_VEL):
+			speed = self.ANG_VEL
 		self.setAngularVelocityByPoint(self.TANK_NUM, speed,[target_x,target_y])
 
 	def drawPredictionGrid(self,x,y):
