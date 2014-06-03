@@ -27,7 +27,7 @@ class OrbitPidgeon(ClayPidgeonAgent):
 		# move up n units
 		originalPosition = self.getMyPosition(0)
 		position = originalPosition
-		distanceFromEnemyBase = 200
+		distanceFromEnemyBase = 140	# bases 300 pixels part
 		while(self.distance(originalPosition, position) < distanceFromEnemyBase):
 			self.commandAgent("speed " + str(self.TANK_NUM) + " " + str(self.VELOCITY))
 			position = self.getMyPosition(0)
