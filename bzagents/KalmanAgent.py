@@ -18,8 +18,7 @@ class KalmanAgent(PFAgent):
 	predictionGrid = []
 	
 	def __init__(self, ip, port):
-		Agent.__init__(self, ip, port)
-		self._initializePF()
+		PFAgent.__init__(self, ip, port)
 		
 		# world details
 		self.shot_speed = float(self.constants['shotspeed'])
@@ -33,11 +32,11 @@ class KalmanAgent(PFAgent):
 		self.resetPredictionGrid()
 		
 		
-	def get_new_target(self, enemy, me):
+	def get_new_target(self, enemy):
 		# Insert kalman filter here
 		enemy_status = enemy[2]
 		enemyPosition = self.getAdjustedPoint([float(enemy[4]),float(enemy[5])])
-		myPosition = self.getAdjustedPoint([int(me[6]),int(me[7])])
+		myPosition = self.getMyPosition(0)
 		
 		if enemy_status == 'alive':
 			self.kalmanFilter.update((enemyPosition[0], enemyPosition[1]), self.delta)
@@ -52,11 +51,11 @@ class KalmanAgent(PFAgent):
 			self.kalmanFilter.reset()
 			self.target = (x, y, False)
 			
-	def tank_controller(self, tank, counter, threshold):
-		tankPoint = self.getAdjustedPoint([int(tank[6]),int(tank[7])])
+	def tank_controller(self, counter, threshold):
+		tankPoint = self.getMyPosition(0)
 		tank_x = tankPoint[0]
 		tank_y = tankPoint[1]
-		tank_angle = self.getAdjustedAngle(float(tank[8]))
+		tank_angle = self.getMyAngle(0)
 		
 		target_x, target_y, alive = self.target
 		distance = self.distance(self.target, (tankPoint[0], tankPoint[1]))
@@ -72,7 +71,7 @@ class KalmanAgent(PFAgent):
 			print "targAng: " + str(target_angle) + "; relAng: " + str(relative_angle) 
 		
 
-		if relative_angle <= .001 and alive:
+		if relative_angle <= .1 and alive:
 			print "shoot!"
 			self.commandAgent("shoot " + str(self.TANK_NUM))
 		
@@ -110,21 +109,16 @@ class KalmanAgent(PFAgent):
 			prev_time = now
 		
 		
-			#print time_diff
 			self.delta += time_diff
 		
-			myTanksInfo = self._query("mytanks")
-			otherTanksInfo = self._query("othertanks")
-			#flagsInfo = self._query("flags")
-			target = otherTanksInfo[0]
-			me = myTanksInfo[self.TANK_NUM]
-			#self.kalmanFilter.update((target.x, target.y), time_diff)
+			me = self._query("mytanks")[0]
+			target = self._query("othertanks")[0]
 			if self.delta >= self.WAIT:
 			
-				self.get_new_target(target, me)
+				self.get_new_target(target)
 				self.delta = 0.0
 			
-			self.tank_controller(myTanksInfo[self.TANK_NUM],counter, threshold)
+			self.tank_controller(counter, threshold)
 			counter += 1
 			if(counter > threshold):
 				counter = 0
