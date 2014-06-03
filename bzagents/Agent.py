@@ -245,7 +245,7 @@ class Agent(object):
 		mytanks = self._query("mytanks")
 		tankInfo = mytanks[tankNum]
 
-		return [float(tankInfo[6]),float(tankInfo[7])]
+		return self.getAdjustedPoint([float(tankInfo[6]),float(tankInfo[7])])
 
 	def getMyAngle(self, tankNum):
 		mytanks = self._query("mytanks")
