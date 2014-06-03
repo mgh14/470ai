@@ -5,7 +5,6 @@ class OrbitPidgeon(ClayPidgeonAgent):
 	def __init__(self,host,ip):
 		ClayPidgeonAgent.__init__(self,host,ip)
 
-		self.TANK_NUM = self.tankNum
 		self.VELOCITY = 1
 		self.ANG_VELOCITY = -.2
 
