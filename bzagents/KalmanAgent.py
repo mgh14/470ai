@@ -63,18 +63,18 @@ class KalmanAgent(PFAgent):
 		relative_angle = abs(target_angle - tank_angle)
 
 
-		if(counter == threshold):
-			otherTank = self._query("othertanks")[0]
-			hisPosition = self.getAdjustedPoint([float(otherTank[4]),float(otherTank[5])])
-			print "\nhisPos: " + str(hisPosition)
-			print "target: " + str(self.target)
-			print "targAng: " + str(target_angle) + "; relAng: " + str(relative_angle) 
+		#if(counter == threshold):
+		#	otherTank = self._query("othertanks")[0]
+		#	hisPosition = self.getAdjustedPoint([float(otherTank[4]),float(otherTank[5])])
+		#	print "\nhisPos: " + str(hisPosition)
+		#	print "target: " + str(self.target)
+		#	print "targAng: " + str(target_angle) + "; relAng: " + str(relative_angle) 
 		
 
 		#if relative_angle <= math.pi and alive:
 		angleTolerance = .001
 		if relative_angle <= angleTolerance and alive:
-			print "shoot!"
+			#print "shoot!"
 			self.commandAgent("shoot " + str(self.TANK_NUM))
 		
 		speed = relative_angle/math.pi
