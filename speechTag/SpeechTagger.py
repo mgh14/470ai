@@ -65,9 +65,8 @@ class SpeechTagger(object):
 		for i in xrange(numWordsToGenerate):
 			#print i
 			#print nGram
-			nextWord = self.pickRandomWord(self.model[nGram])
+			nextWord = self.pickRandomWord(self.model.get(nGram, self.model[random.choice(self.model.keys())]))
 			#builds the next nGram by shifting left and appending new word
-
 			nGram = nGram[1:] + (nextWord,)
 
 			#print nGram, ' <-new'
