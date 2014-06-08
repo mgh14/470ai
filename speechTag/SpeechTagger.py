@@ -1,4 +1,5 @@
 #from nltk import *
+import random
 
 class SpeechTagger(object):
 	
@@ -54,11 +55,43 @@ class SpeechTagger(object):
 		#print str(len(self.tokens))
 		
 		
-	def generateText()	
+	def generateText(self, nGramSeed, numWordsToGenerate):
+		print
 		
-	def pick_random(prob_list):
+		nGram = nGramSeed
+		for n in xrange(self.gramDegree):
+			print nGramSeed[n],
+
+		for i in xrange(numWordsToGenerate):
+			#print i
+			#print nGram
+			nextWord = self.pickRandomWord(self.model[nGram])
+			#builds the next nGram by shifting left and appending new word
+
+			nGram = nGram[1:] + (nextWord,)
+
+			#print nGram, ' <-new'
+			print nextWord,
+			
+		print
+		print
+		
+	def pickRandomWord(self, nextWordDict):
+		total = 0
+		probabilitiesList = []
+		for key, value in nextWordDict.items():
+			total = total + int(value)
+			probabilitiesList.append([key,float(value)])
+		
+		for prob in probabilitiesList:
+			prob[1] = float(prob[1]) / float(total)
+		
+		#print total
+		#print probabilitiesList
+			
+	
 		r, s = random.random(), 0
-		for num in prob_list:
+		for num in probabilitiesList:
 			s += num[1]
 			if s >= r:
 				return num[0]
