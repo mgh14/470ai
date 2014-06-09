@@ -1,5 +1,6 @@
 #from nltk import *
 import random
+import math
 
 class SpeechTagger(object):
 	
@@ -19,6 +20,8 @@ class SpeechTagger(object):
 		self.HMMtransition = {}
 		self.HMMemission = {}
 		self.HMMstartProbability = {}
+		self.totalPOScount = {}
+		self.transitionTotal = {}
 
 		self.train(self.DATA_FOLDER + self.TRAIN_PATH)
 
@@ -32,7 +35,7 @@ class SpeechTagger(object):
 		for text in self.tokens:
 			#print "text: " + text
 			posOfSeparator = text.index(self.SEPARATOR_CHAR)
-			word = text[0:posOfSeparator]
+			word = text[0:posOfSeparator].lower()
 			pos = text[posOfSeparator+1:]
 			self.POS.append(pos)
 			self.words.append(word)
@@ -61,9 +64,13 @@ class SpeechTagger(object):
 				nGram = tuple(self.POS[i:j])
 				nextPOS = self.POS[i+self.gramDegree]
 				nextPOScounts = self.HMMtransition.get(nGram, {})
+				if not nextPOScounts.has_key('total'):
+					nextPOScounts['total'] = 0
 				if nextPOScounts.has_key(nextPOS):
-					nextPOScounts[nextPOS] = nextPOScounts[nextPOS] + 1
+					nextPOScounts[nextPOS] += 1
+					nextPOScounts['total'] += 1
 				else:
+					nextPOScounts['total'] += 1
 					nextPOScounts[nextPOS] = 1
 				self.HMMtransition[nGram] = nextPOScounts
 				
@@ -85,16 +92,40 @@ class SpeechTagger(object):
 					self.HMMstartProbability[pos] = self.HMMstartProbability[pos] + 1
 				else:
 					self.HMMstartProbability[pos] = 1
-				
+		
+		for key in self.HMMstartProbability:
+			self.HMMstartProbability[key] /= float(len(self.POS))
+		
+
+		for key in self.HMMtransition:
+			for posKey in self.HMMtransition[key]:
+				if posKey == 'total':
+					self.transitionTotal[key] = self.HMMtransition[key]['total']
+					continue
+				self.HMMtransition[key][posKey] /= float(self.HMMtransition[key]['total'])
+
+			del self.HMMtransition[key]['total']
 			
+		
+		for key in self.HMMemission:
+			total = 0
+			for word in self.HMMemission[key]:
+				total += self.HMMemission[key][word]
+			self.totalPOScount[key] = total
+			
+		for key in self.HMMemission:
+			for word in self.HMMemission[key]:
+				self.HMMemission[key][word] /= float(self.totalPOScount[key])
+				
+		
 				
 
 		#print str(len(self.tokens))
-		#print self.HMMtransition[("IN","DT","NNP")]
+		#print self.HMMtransition[("IN",)]
 		#print self.HMMemission['IN']
 		#print self.HMMstartProbability
-		print self.viterbi(['The','economy'],list(set(self.POS)),self.HMMstartProbability,self.HMMtransition,self.HMMemission)
-		
+		print self.transitionTotal
+		print self.viterbi(['The','economy','\'s','temperature'],list(set(self.POS)),self.HMMstartProbability,self.HMMtransition,self.HMMemission)
 		
 	def viterbi(self,obs, states, start_p, trans_p, emit_p):
 		V = [{}]
@@ -102,9 +133,9 @@ class SpeechTagger(object):
 	 
 		# Initialize base cases (t == 0)
 		for y in states:
-			#print y
-			#print emit_p[y]
-			V[0][y] = start_p[y] * emit_p[y].get(obs[0], 1)
+
+			#V[0][y] = start_p[y] * emit_p[y].get(obs[0], 0.1/self.totalPOScount[y])
+			V[0][y] = math.log(start_p[y]) + math.log(emit_p[y].get(obs[0], 1/self.totalPOScount[y]))
 			path[y] = [y]
 	 
 		# Run Viterbi for t > 0
@@ -113,7 +144,8 @@ class SpeechTagger(object):
 			newpath = {}
 			
 			for y in states:
-				(prob, state) = max((V[t-1][y0] * trans_p[(y0,)].get(y,1) * emit_p[y].get(obs[t], 1), y0) for y0 in states)
+				#(prob, state) = max((V[t-1][y0] * trans_p[(y0,)].get(y,0.1/self.transitionTotal[(y,)]) * emit_p[y].get(obs[t], 0.1/self.totalPOScount[y]), y0) for y0 in states)
+				(prob, state) = max((math.log(V[t-1][y0]) + math.log(trans_p[(y0,)].get(y,1/self.transitionTotal[(y,)])) + math.log(emit_p[y].get(obs[t], 1/self.totalPOScount[y])), y0) for y0 in states)
 				V[t][y] = prob
 				newpath[y] = path[state] + [y]
 	 
@@ -122,11 +154,18 @@ class SpeechTagger(object):
 		n = 0           # if only one element is observed max is sought in the initialization values
 		if len(obs)!=1:
 			n = t
-		#print_dptable(V)
+		self.print_dptable(V)
 		(prob, state) = max((V[n][y], y) for y in states)
 		return (prob, path[state])
 
-		
+	def print_dptable(self,V):
+		s = "    " + " ".join(("%7d" % i) for i in range(len(V))) + "\n"
+		for y in V[0]:
+			s += "%.5s: " % y
+			s += " ".join("%.7s" % ("%f" % v[y]) for v in V)
+			s += "\n"
+		print(s)
+
 		
 	def generateText(self, nGramSeed, numWordsToGenerate):
 		print
