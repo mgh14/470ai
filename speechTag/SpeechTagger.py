@@ -16,7 +16,9 @@ class SpeechTagger(object):
 		self.words = []
 		self.POS = []
 		self.langModel = {}
-		self.HMM = {}
+		self.HMMtransition = {}
+		self.HMMemission = {}
+		self.HMMstartProbability = {}
 
 		self.train(self.DATA_FOLDER + self.TRAIN_PATH)
 
@@ -54,21 +56,75 @@ class SpeechTagger(object):
 				self.langModel[nGram] = nextWordCounts
 				
 				########################
-				# Build HMM            #
+				# Build HMM transition #
 				########################
 				nGram = tuple(self.POS[i:j])
 				nextPOS = self.POS[i+self.gramDegree]
-				nextPOScounts = self.HMM.get(nGram, {})
+				nextPOScounts = self.HMMtransition.get(nGram, {})
 				if nextPOScounts.has_key(nextPOS):
 					nextPOScounts[nextPOS] = nextPOScounts[nextPOS] + 1
 				else:
 					nextPOScounts[nextPOS] = 1
-				self.HMM[nGram] = nextPOScounts
+				self.HMMtransition[nGram] = nextPOScounts
+				
+			##############################################
+			# Build HMM emission  and start probability  #
+			##############################################
+			for j in xrange(i+1, min(numWords, i+1)+1):
+				pos = self.POS[i:j][0]
+				word = self.words[i:j][0]
+				posWordCounts = self.HMMemission.get(pos,{})
+				if posWordCounts.has_key(word):
+					posWordCounts[word] = posWordCounts[word] + 1
+				else:
+					posWordCounts[word] = 1
+				self.HMMemission[pos] = posWordCounts
+				
+				#start prob
+				if self.HMMstartProbability.has_key(pos):
+					self.HMMstartProbability[pos] = self.HMMstartProbability[pos] + 1
+				else:
+					self.HMMstartProbability[pos] = 1
+				
+			
 				
 
 		#print str(len(self.tokens))
-		#print self.HMM[("IN","DT","NNP")]
+		#print self.HMMtransition[("IN","DT","NNP")]
+		#print self.HMMemission['IN']
+		#print self.HMMstartProbability
+		print self.viterbi(['The','economy'],list(set(self.POS)),self.HMMstartProbability,self.HMMtransition,self.HMMemission)
 		
+		
+	def viterbi(self,obs, states, start_p, trans_p, emit_p):
+		V = [{}]
+		path = {}
+	 
+		# Initialize base cases (t == 0)
+		for y in states:
+			#print y
+			#print emit_p[y]
+			V[0][y] = start_p[y] * emit_p[y].get(obs[0], 1)
+			path[y] = [y]
+	 
+		# Run Viterbi for t > 0
+		for t in range(1, len(obs)):
+			V.append({})
+			newpath = {}
+			
+			for y in states:
+				(prob, state) = max((V[t-1][y0] * trans_p[(y0,)].get(y,1) * emit_p[y].get(obs[t], 1), y0) for y0 in states)
+				V[t][y] = prob
+				newpath[y] = path[state] + [y]
+	 
+			# Don't need to remember the old paths
+			path = newpath
+		n = 0           # if only one element is observed max is sought in the initialization values
+		if len(obs)!=1:
+			n = t
+		#print_dptable(V)
+		(prob, state) = max((V[n][y], y) for y in states)
+		return (prob, path[state])
 
 		
 		
