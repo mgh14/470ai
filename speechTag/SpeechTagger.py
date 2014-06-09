@@ -14,7 +14,9 @@ class SpeechTagger(object):
 		self.gramDegree = gramDegree
 		self.tokens = []
 		self.words = []
-		self.model = {}
+		self.POS = []
+		self.langModel = {}
+		self.HMM = {}
 
 		self.train(self.DATA_FOLDER + self.TRAIN_PATH)
 
@@ -29,43 +31,59 @@ class SpeechTagger(object):
 			#print "text: " + text
 			posOfSeparator = text.index(self.SEPARATOR_CHAR)
 			word = text[0:posOfSeparator]
-			POS = text[posOfSeparator+1:]
+			pos = text[posOfSeparator+1:]
+			self.POS.append(pos)
 			self.words.append(word)
-			#print "word: " + word + "; pos: " + POS
+			#print "word: " + word + "; pos: " + pos
 		
 		numWords = len(self.words)
 		for i in xrange(numWords):
 			for j in xrange(i+self.gramDegree, min(numWords,i+self.gramDegree)+1):
-				
-				nGram = tuple(self.words[i:j])
 				if i+self.gramDegree > numWords-1:
 					break
-				nextWordSeen = self.words[i+self.gramDegree]
-				#print nGram,
-				#print nextWordSeen
-				
-				nextWordCounts = self.model.get(nGram, {}) 
+				########################
+				# Build Language Model #
+				########################
+				nGram = tuple(self.words[i:j])
+				nextWordSeen = self.words[i+self.gramDegree]			
+				nextWordCounts = self.langModel.get(nGram, {}) 
 				if nextWordCounts.has_key(nextWordSeen):
 					nextWordCounts[nextWordSeen] = nextWordCounts[nextWordSeen] + 1
 				else:
 					nextWordCounts[nextWordSeen] = 1
-				self.model[nGram] = nextWordCounts
-		
-		#print self.model
+				self.langModel[nGram] = nextWordCounts
+				
+				########################
+				# Build HMM            #
+				########################
+				nGram = tuple(self.POS[i:j])
+				nextPOS = self.POS[i+self.gramDegree]
+				nextPOScounts = self.HMM.get(nGram, {})
+				if nextPOScounts.has_key(nextPOS):
+					nextPOScounts[nextPOS] = nextPOScounts[nextPOS] + 1
+				else:
+					nextPOScounts[nextPOS] = 1
+				self.HMM[nGram] = nextPOScounts
+				
+
 		#print str(len(self.tokens))
+		#print self.HMM[("IN","DT","NNP")]
+		
+
 		
 		
 	def generateText(self, nGramSeed, numWordsToGenerate):
 		print
 		
 		nGram = nGramSeed
+		#print original seed words
 		for n in xrange(self.gramDegree):
 			print nGramSeed[n],
 
 		for i in xrange(numWordsToGenerate):
 			#print i
 			#print nGram
-			nextWord = self.pickRandomWord(self.model.get(nGram, self.model[random.choice(self.model.keys())]))
+			nextWord = self.pickRandomWord(self.langModel.get(nGram, self.langModel[random.choice(self.langModel.keys())]))
 			#builds the next nGram by shifting left and appending new word
 			nGram = nGram[1:] + (nextWord,)
 
