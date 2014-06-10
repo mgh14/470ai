@@ -116,26 +116,18 @@ class SpeechTagger(object):
 		for key in self.HMMemission:
 			for word in self.HMMemission[key]:
 				self.HMMemission[key][word] /= float(self.totalPOScount[key])
-				
-		
-				
 
-		#print str(len(self.tokens))
-		#print self.HMMtransition[("IN",)]
-		#print self.HMMemission['IN']
-		#print self.HMMstartProbability
-		print self.transitionTotal
 		print self.viterbi(['The','economy','\'s','temperature'],list(set(self.POS)),self.HMMstartProbability,self.HMMtransition,self.HMMemission)
 		
-	def viterbi(self,obs, states, start_p, trans_p, emit_p):
+	def viterbi(self, obs, states, start_p, trans_p, emit_p):
 		V = [{}]
 		path = {}
 	 
 		# Initialize base cases (t == 0)
 		for y in states:
-
+			smoothingConst = float(.1) / self.totalPOScount[y]
 			#V[0][y] = start_p[y] * emit_p[y].get(obs[0], 0.1/self.totalPOScount[y])
-			V[0][y] = math.log(start_p[y]) + math.log(emit_p[y].get(obs[0], 1/self.totalPOScount[y]))
+			V[0][y] = math.log(start_p[y]) + math.log(emit_p[y].get(obs[0], smoothingConst))
 			path[y] = [y]
 	 
 		# Run Viterbi for t > 0
@@ -143,9 +135,12 @@ class SpeechTagger(object):
 			V.append({})
 			newpath = {}
 			
-			for y in states:
-				#(prob, state) = max((V[t-1][y0] * trans_p[(y0,)].get(y,0.1/self.transitionTotal[(y,)]) * emit_p[y].get(obs[t], 0.1/self.totalPOScount[y]), y0) for y0 in states)
-				(prob, state) = max((math.log(V[t-1][y0]) + math.log(trans_p[(y0,)].get(y,1/self.transitionTotal[(y,)])) + math.log(emit_p[y].get(obs[t], 1/self.totalPOScount[y])), y0) for y0 in states)
+			for y in states:				
+				transitionConst = float(.1) / self.transitionTotal[(y,)]
+				emitConst = float(.1) / self.totalPOScount[y]
+
+				(prob, state) = max((V[t-1][y0] + math.log(trans_p[(y0,)].get(y,transitionConst)) + math.log(emit_p[y].get(obs[t], emitConst)), y0) for y0 in states)
+
 				V[t][y] = prob
 				newpath[y] = path[state] + [y]
 	 
