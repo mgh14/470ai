@@ -3,7 +3,7 @@ import random
 import math
 import time
 
-class SpeechTagger(object):
+class SpeechTagger1Gram(object):
 	
 	# Member constants
 	DATA_FOLDER = "assignment3data/"
