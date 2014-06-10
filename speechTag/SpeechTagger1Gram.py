@@ -175,11 +175,11 @@ class SpeechTagger1Gram(object):
 		path = {}
 	 
 		# Initialize base cases (t = 0)
-		for y in states:
-			#V[0][y] = start_p[y] * emit_p[y].get(obs[0], 0.1/self.totalPOScount[y])
-			smoothingConst = .1 / self.totalPOScount[y]
-			V[0][y] = math.log(startProbs[y]) + math.log(emitProbs[y].get(wordSequence[0], smoothingConst))
-			path[y] = [y]
+		for state in states:
+			#V[0][state] = start_p[state] * emit_p[state].get(obs[0], 0.1/self.totalPOScount[state])
+			smoothingConst = .1 / self.totalPOScount[state]
+			V[0][state] = math.log(startProbs[state]) + math.log(emitProbs[state].get(wordSequence[0], smoothingConst))
+			path[state] = [state]
 	 
 		# Run Viterbi for t > 0
 		for t in range(1, len(wordSequence)):
@@ -188,14 +188,14 @@ class SpeechTagger1Gram(object):
 			V[t] = {}
 			newpath = {}
 			
-			for y in states:				
-				transitionConst = .1 / self.transitionTotal[(y,)]
-				emitConst = .1 / self.totalPOScount[y]
+			for outerState in states:				
+				transitionConst = .1 / self.transitionTotal[(outerState,)]
+				emitConst = .1 / self.totalPOScount[outerState]
 
-				(prob, state) = max((V[t-1][y0] + math.log(transProbs[(y0,)].get(y,transitionConst)) + math.log(emitProbs[y].get(wordSequence[t], emitConst)), y0) for y0 in states)
+				(prob, state) = max((V[t-1][innerState] + math.log(transProbs[(innerState,)].get(outerState,transitionConst)) + math.log(emitProbs[outerState].get(wordSequence[t], emitConst)), innerState) for innerState in states)
 
-				V[t][y] = prob
-				newpath[y] = path[state] + [y]
+				V[t][outerState] = prob
+				newpath[outerState] = path[state] + [outerState]
 	 
 			# Don't need to remember the old paths
 			path = newpath
@@ -204,7 +204,7 @@ class SpeechTagger1Gram(object):
 			if len(wordSequence)!=1:
 				n = t
 
-		(prob, state) = max((V[n][y], y) for y in states)
+		(prob, state) = max((V[n][state], state) for state in states)
 		return (prob, path[state])
 
 
@@ -240,10 +240,10 @@ class SpeechTagger1Gram(object):
 
   	def classifyTestData(self):
 		path = self.DATA_FOLDER + self.TEST_PATH
-		print "Parsing test file " + path
+		print "Parsing test file \'" + path + "\'"
 		testArrays = self.parseTestFile(path)
 		tokens = testArrays[0]
-		fileWords = testArrays[1]
+		fileWords = testArrays[1][0:100]
 		POS = testArrays[2]
 		testCounts = testArrays[3]
 		
@@ -251,7 +251,7 @@ class SpeechTagger1Gram(object):
 		print str(len(fileWords)) + " words to be classified from " + self.TEST_PATH
 		print "Running Viterbi..."
 		startTime = time.time()
-		(prob, tags) = self.viterbi(fileWords,self.POSdict,self.HMMstartProbability,self.HMMtransition,self.HMMemission)
+		(prob, tags) = self.viterbi(fileWords[0:100],self.POSdict,self.HMMstartProbability,self.HMMtransition,self.HMMemission)
 		print "Finished classifying in " + str(time.time() - startTime) + " seconds."
 		
 		# print out statistics
