@@ -8,13 +8,13 @@ class SpeechTagger(object):
 	# Member constants
 	DATA_FOLDER = "assignment3data/"
 	TRAIN_PATH = "allTraining.txt"
-	TEST_PATH = "devTest.txt"
+	TEST_PATH = "devtest.txt"
 	SEPARATOR_CHAR = "_"
 
 	def __init__(self,gramDegree):
 		# Member variables
 		self.gramDegree = gramDegree
-		self.tokens = []
+		self.trainingTokens = []
 		self.words = []
 		self.POS = []
 		self.POSdict = {}
@@ -34,12 +34,11 @@ class SpeechTagger(object):
 		fileStr = ""
 		with open(filepath) as f:
 			for line in f:
-				fileStr += "\n" + line.strip() + "\n"
+				fileStr += "\n" + line.strip()
 
-		self.tokens = fileStr.split()
+		self.trainingTokens = fileStr.split()
 		counter = 0
-		for text in self.tokens:
-			#print "text: " + text
+		for text in self.trainingTokens:
 			posOfSeparator = text.index(self.SEPARATOR_CHAR)
 			word = text[0:posOfSeparator].lower()
 			pos = text[posOfSeparator+1:]
@@ -47,7 +46,6 @@ class SpeechTagger(object):
 			self.POSdict[pos] = pos
 			counter += 1
 			self.words.append(word)
-			#print "word: " + word + "; pos: " + pos
 		
 		numWords = len(self.words)
 		for i in xrange(numWords):
@@ -123,45 +121,7 @@ class SpeechTagger(object):
 			for word in self.HMMemission[key]:
 				self.HMMemission[key][word] /= float(self.totalPOScount[key])
 
-		print "Training finished in " + str(time.time() - startTime) + " seconds"
-		
-	def viterbi(self, obs, states, start_p, trans_p, emit_p):
-		origTime = time.time()
-		V = {0: {}}
-		path = {}
-	 
-		# Initialize base cases (t == 0)
-		for y in states:
-			#V[0][y] = start_p[y] * emit_p[y].get(obs[0], 0.1/self.totalPOScount[y])
-			smoothingConst = float(.1) / self.totalPOScount[y]
-			V[0][y] = math.log(start_p[y]) + math.log(emit_p[y].get(obs[0], smoothingConst))
-			path[y] = [y]
-	 
-		# Run Viterbi for t > 0
-		for t in range(1, len(obs)):
-			if(t % 10000 == 0):
-				print "Calculating t=" + str(t) + " (" + str(time.time()-origTime) + " seconds elapsed)..."
-			V[t] = {}
-			newpath = {}
-			
-			for y in states:				
-				transitionConst = float(.1) / self.transitionTotal[(y,)]
-				emitConst = float(.1) / self.totalPOScount[y]
-
-				(prob, state) = max((V[t-1][y0] + math.log(trans_p[(y0,)].get(y,transitionConst)) + math.log(emit_p[y].get(obs[t], emitConst)), y0) for y0 in states)
-
-				V[t][y] = prob
-				newpath[y] = path[state] + [y]
-	 
-			# Don't need to remember the old paths
-			path = newpath
-
-		n = 0           # if only one element is observed max is sought in the initialization values
-		if len(obs)!=1:
-			n = t
-
-		(prob, state) = max((V[n][y], y) for y in states)
-		return (prob, path[state])
+		print "Training finished in " + str(time.time() - startTime) + " seconds"		
 		
 	def generateText(self, nGramSeed, numWordsToGenerate):
 		print
@@ -204,6 +164,45 @@ class SpeechTagger(object):
 			if s >= r:
 				return num[0]
 
+	def viterbi(self, wordSequence, states, startProbs, transProbs, emitProbs):
+		origTime = time.time()
+		V = {0: {}}
+		path = {}
+	 
+		# Initialize base cases (t = 0)
+		for y in states:
+			#V[0][y] = start_p[y] * emit_p[y].get(obs[0], 0.1/self.totalPOScount[y])
+			smoothingConst = .1 / self.totalPOScount[y]
+			V[0][y] = math.log(startProbs[y]) + math.log(emitProbs[y].get(wordSequence[0], smoothingConst))
+			path[y] = [y]
+	 
+		# Run Viterbi for t > 0
+		for t in range(1, len(wordSequence)):
+			if(t % 10000 == 0):
+				print "Calculating t=" + str(t) + " (" + str(time.time()-origTime) + " seconds elapsed)..."
+			V[t] = {}
+			newpath = {}
+			
+			for y in states:				
+				transitionConst = .1 / self.transitionTotal[(y,)]
+				emitConst = .1 / self.totalPOScount[y]
+
+				(prob, state) = max((V[t-1][y0] + math.log(transProbs[(y0,)].get(y,transitionConst)) + math.log(emitProbs[y].get(wordSequence[t], emitConst)), y0) for y0 in states)
+
+				V[t][y] = prob
+				newpath[y] = path[state] + [y]
+	 
+			# Don't need to remember the old paths
+			path = newpath
+
+			n = 0 	# if only one element is observed max is sought in the initialization values
+			if len(wordSequence)!=1:
+				n = t
+
+		(prob, state) = max((V[n][y], y) for y in states)
+		return (prob, path[state])
+
+
 	def parseTestFile(self, filepath):
 		fileStr = ""
 		with open(filepath) as f:
@@ -212,10 +211,10 @@ class SpeechTagger(object):
 
 		tokens = fileStr.split()
 		POS = []
-		words = []
+		fileWords = []
 		counts = {}
-		for text in self.tokens:
-			#print "text: " + text
+		counter = 0
+		for text in tokens:
 			posOfSeparator = text.index(self.SEPARATOR_CHAR)
 			word = text[0:posOfSeparator].lower()
 			pos = text[posOfSeparator+1:]
@@ -225,21 +224,23 @@ class SpeechTagger(object):
 			else:
 				counts[pos] = 1
 
-			words.append(word)
-			#print "word: " + word + "; pos: " + pos		
+			fileWords.append(word)
 
-		return (tokens, words, POS, counts)
+		return (tokens, fileWords, POS, counts)
 
   	def classifyTestData(self):
-		testArrays = self.parseTestFile(self.DATA_FOLDER + self.TRAIN_PATH)
-		#for a in range(0,len(testArrays[0])-1):
-		#	print "here: " + str(testArrays[0][a]) + "; " + str(testArrays[1][a]) + "; " + str(testArrays[2][a])
+		path = self.DATA_FOLDER + self.TEST_PATH
+		print "Parsing test file " + path
+		testArrays = self.parseTestFile(path)
 		
+		# tag the words in the sequence
+		print str(len(testArrays[1])) + " words to be classified from " + self.TEST_PATH
 		print "Running Viterbi..."
 		startTime = time.time()
 		(prob, tags) = self.viterbi(testArrays[1],self.POSdict,self.HMMstartProbability,self.HMMtransition,self.HMMemission)
 		print "Finished classifying in " + str(time.time() - startTime) + " seconds."
 		
+		# print out statistics
 		counter = 0
 		counts = {}
 		testCounts = testArrays[3]
