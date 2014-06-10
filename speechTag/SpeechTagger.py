@@ -260,4 +260,3 @@ class SpeechTagger(object):
 
 		correct = len(tags) - counter
 		print str(correct) + " total words correctly classified out of " + str(len(tags)) + " (" + str(float(correct)*100/len(tags)) + "%)"
-
