@@ -7,7 +7,7 @@ class SpeechTagger(object):
 	
 	# Member constants
 	DATA_FOLDER = "assignment3data/"
-	TRAIN_PATH = "allTraining.txt"
+	TRAIN_PATH = "pp.txt"
 	TEST_PATH = "devTest.txt"
 	SEPARATOR_CHAR = "_"
 
@@ -40,9 +40,13 @@ class SpeechTagger(object):
 		counter = 0
 		for text in self.tokens:
 			#print "text: " + text
-			posOfSeparator = text.index(self.SEPARATOR_CHAR)
-			word = text[0:posOfSeparator].lower()
-			pos = text[posOfSeparator+1:]
+			if self.SEPARATOR_CHAR in text:
+				posOfSeparator = text.index(self.SEPARATOR_CHAR)
+				word = text[0:posOfSeparator].lower()
+				pos = text[posOfSeparator+1:]
+			else:
+				word = text
+				pos = text
 			self.POS.append(pos)
 			self.POSdict[pos] = pos
 			counter += 1
@@ -163,13 +167,13 @@ class SpeechTagger(object):
 		(prob, state) = max((V[n][y], y) for y in states)
 		return (prob, path[state])
 		
-	def generateText(self, nGramSeed, numWordsToGenerate):
+	def generateText(self, numWordsToGenerate):
 		print
 		
-		nGram = nGramSeed
+		nGram = random.choice(self.langModel.keys())
 		#print original seed words
 		for n in xrange(self.gramDegree):
-			print nGramSeed[n],
+			print nGram[n],
 
 		for i in xrange(numWordsToGenerate):
 			#print i
@@ -216,9 +220,13 @@ class SpeechTagger(object):
 		counts = {}
 		for text in self.tokens:
 			#print "text: " + text
-			posOfSeparator = text.index(self.SEPARATOR_CHAR)
-			word = text[0:posOfSeparator].lower()
-			pos = text[posOfSeparator+1:]
+			if self.SEPARATOR_CHAR in text:
+				posOfSeparator = text.index(self.SEPARATOR_CHAR)
+				word = text[0:posOfSeparator].lower()
+				pos = text[posOfSeparator+1:]
+			else:
+				pos = text
+				word = text
 			POS.append(pos)
 			if pos in counts:
 				counts[pos] += 1
