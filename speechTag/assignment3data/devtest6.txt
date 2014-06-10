@@ -1,0 +1,101 @@
+little_RB understood_VBN on_IN Capitol_NNP Hill_NNP ._.
+There_EX were_VBD also_RB calls_VBZ to_TO strip_VB the_DT stock_NN markets_NNS of_IN ``_`` derivative_JJ ''_'' products_NNS ,_, such_JJ as_IN stock-index_JJ futures_NNS and_CC options_NNS ,_, which_WDT Federal_NNP Judge_NNP Stanley_NNP Sporkin_NNP ,_, for_IN example_NN ,_, likened_VBD to_TO ``_`` barnacles_NNS attached_VBN to_TO the_DT basic_JJ market_NN ._. ''_''
+And_CC there_EX was_VBD much_JJ criticism_NN of_IN the_DT New_NNP York_NNP Stock_NNP Exchange_NNP 's_POS system_NN of_IN having_VBG stock_NN trades_NNS flow_VB through_IN specialists_NNS ,_, or_CC market_NN makers_NNS ._.
+When_WRB the_DT Brady_NNP Task_NNP Force_NNP 's_POS powerful_JJ analysis_NN of_IN the_DT crash_NN was_VBD released_VBN in_IN January_NNP 1988_CD ,_, it_PRP immediately_RB reshaped_VBD the_DT reformers_NNS '_POS agenda_NN ._.
+Arguing_VBG that_IN the_DT separate_JJ financial_JJ marketplaces_NNS acted_VBD as_IN one_CD ,_, and_CC concluding_VBG that_IN the_DT crash_NN had_VBD ``_`` raised_VBN the_DT possibility_NN of_IN a_DT full-scale_JJ financial_JJ system_NN breakdown_NN ,_, ''_'' the_DT presidential_JJ task_NN force_NN called_VBD for_IN establishing_VBG a_DT super-regulator_NN to_TO oversee_VB the_DT markets_NNS ,_, to_TO make_VB margins_NNS consistent_JJ across_IN markets_NNS ,_, to_TO unify_VB clearing_VBG systems_NNS and_CC to_TO install_VB circuit_NN breakers_NNS ._.
+Only_RB the_DT last_JJ of_IN those_DT recommendations_NNS ever_RB was_VBD implemented_VBN ._.
+The_DT Reagan_NNP White_NNP House_NNP held_VBD the_DT Brady_NNP recommendations_NNS at_IN arm_NN 's_POS length_NN and_CC named_VBD a_DT second_JJ panel_NN --_: the_DT Working_NNP Group_NNP on_IN the_DT Financial_NNP Markets_NNPS --_: to_TO review_VB its_PRP$ analysis_NN and_CC those_DT of_IN other_JJ crash_NN studies_NNS ._.
+In_IN May_NNP 1988_CD ,_, the_DT Working_NNP Group_NNP ,_, made_VBD up_RP of_IN representatives_NNS from_IN the_DT Federal_NNP Reserve_NNP ,_, the_DT Treasury_NNP ,_, the_DT Securities_NNPS and_CC Exchange_NNP Commission_NNP ,_, and_CC the_DT Commodity_NNP Futures_NNPS Trading_NNP Commission_NNP ,_, finally_RB endorsed_VBD only_JJ circuit_NN breakers_NNS ._.
+After_IN several_JJ more_JJR months_NNS of_IN arguments_NNS among_IN various_JJ stock_NN exchanges_NNS and_CC futures_NNS markets_NNS ,_, circuit_NN breakers_NNS were_VBD set_VBN in_IN place_NN ,_, with_IN the_DT most_RBS notable_JJ suspending_VBG trading_NN after_IN 250_CD and_CC 400_CD point_NN drops_NNS in_IN the_DT Dow_NNP Jones_NNP Industrial_NNP Average_NNP ._.
+Privately_RB ,_, some_DT free_JJ marketeers_NNS dismissed_VBD such_JJ mechanisms_NNS as_IN sops_NNS to_TO interventionists_NNS ._.
+After_IN all_DT ,_, this_DT free-market_NN argument_NN went_VBD ,_, the_DT Dow_NNP only_RB dropped_VBD more_JJR than_IN 250_CD points_NNS once_RB this_DT century_NN ._.
+``_`` Circuit_NN breakers_NNS ''_'' set_VBN to_TO soften_VB big_JJ drops_NNS :_:
+--_: If_IN S&P_NNP futures_NNS fall_VBP 5_CD points_NNS at_IN opening_NN ,_, contract_NN trading_NN pauses_VBZ for_IN 10_CD minutes_NNS ._.
+--_: If_IN Dow_NNP Industrials_NNPS fall_VBP 25_CD points_NNS at_IN opening_NN ,_, contract_NN trading_NN pauses_VBZ for_IN 10_CD minutes_NNS ._.
+--_: If_IN S&P_NNP futures_NNS fall_VBP 12_CD points_NNS -LRB-_-LRB- equivalent_NN to_TO about_IN 100_CD points_NNS on_IN DJIA_NNP -RRB-_-RRB- ,_, trading_NN is_VBZ frozen_VBN for_IN half_DT hour_NN to_TO that_DT price_NN or_CC higher_JJR ._.
+On_IN NYSE_NNP program_NN trades_NNS are_VBP diverted_VBN into_IN a_DT separate_JJ computer_NN file_NN to_TO determine_VB buy_VB and_CC sell_VB orders_NNS ._.
+--_: If_IN S&P_NNP futures_NNS fall_VBP 30_CD points_NNS ,_, trading_NN is_VBZ restricted_VBN for_IN an_DT hour_NN to_TO that_DT price_NN or_CC higher_JJR ._.
+--_: If_IN Dow_NNP Industrials_NNPS fall_VBP 250_CD points_NNS ,_, trading_NN on_IN the_DT Big_NNP Board_NNP halts_VBZ for_IN an_DT hour_NN ._.
+S&P_NNP and_CC MMI_NNP contracts_NNS also_RB halt_VBP ._.
+--_: If_IN DJIA_NNP drops_VBZ 400_CD points_NNS ,_, Big_NNP Board_NNP halts_VBZ trading_NN for_IN two_CD hours_NNS ._.
+Trading_NN in_IN MMI_NNP and_CC S&P_NNP futures_NNS also_RB halted_VBD ._.
+Brady_NNP Task_NNP Force_NNP recommendations_NNS -LRB-_-LRB- Jan._NNP 1988_CD -RRB-_-RRB- :_:
+--_: Establish_VB an_DT overarching_VBG regulator_NN for_IN financial_JJ markets_NNS
+--_: Unify_VB trade-clearing_JJ systems_NNS
+--_: Make_VB margins_NNS consistent_JJ across_IN stock_NN and_CC futures_NNS markets_NNS
+SEC_NNP proposals_NNS -LRB-_-LRB- May_NNP 1988_CD -RRB-_-RRB- :_:
+--_: Require_VB prompt_JJ reports_NNS of_IN large_JJ securities_NNS trades_NNS ._.
+--_: Give_VB SEC_NNP authority_NN to_TO monitor_VB risk-taking_NN by_IN affiliates_NNS of_IN brokerage_NN firms_NNS ._.
+--_: Transfer_NN jurisdiction_NN over_IN stock-related_JJ futures_NNS to_TO SEC_NNP from_IN CFTC_NNP ._.
+-LRB-_-LRB- Opposed_VBN by_IN new_JJ SEC_NNP chairman_NN -RRB-_-RRB-
+--_: Give_VB SEC_NNP authority_NN to_TO halt_VB securities_NNS trading_NN ,_, -LRB-_-LRB- also_RB opposed_VBN by_IN new_JJ SEC_NNP chairman_NN -RRB-_-RRB- ._.
+Congressional_JJ proposal_NN :_:
+--_: Create_VB a_DT task_NN force_NN to_TO review_VB current_JJ state_NN of_IN the_DT securities_NNS markets_NNS and_CC securities_NNS laws_NNS ._.
+Breaking_VBG the_DT Soviet_JJ government_NN 's_POS television_NN monopoly_NN ,_, an_DT independent_JJ company_NN has_VBZ gained_VBN rights_NNS to_TO show_VB world_NN programming_NN ,_, including_VBG American_JJ films_NNS ._.
+``_`` There_EX must_MD not_RB be_VB a_DT monopoly_NN ,_, there_EX must_MD be_VB freedom_NN of_IN choice_NN for_IN both_DT journalists_NNS and_CC viewers_NNS ,_, ''_'' Nikolai_NNP I._NNP Lutsenko_NNP ,_, the_DT president_NN of_IN the_DT Nika_NNP TV_NN company_NN ,_, told_VBD the_DT weekly_JJ newspaper_NN Nedelya_NNP ._.
+The_DT company_NN is_VBZ already_RB working_VBG on_IN its_PRP$ own_JJ programming_NN in_IN several_JJ provincial_JJ cities_NNS and_CC hopes_VBZ to_TO be_VB on_IN the_DT air_NN regularly_RB in_IN about_IN a_DT year_NN ,_, the_DT newspaper_NN said_VBD ._.
+Mr._NNP Lutsenko_NNP told_VBD Nedelya_NNP that_IN he_PRP recently_RB had_VBD been_VBN to_TO the_DT U.S._NNP to_TO pick_VB up_RP the_DT rights_NNS to_TO show_VB 5,000_CD U.S._NNP films_NNS in_IN the_DT Soviet_NNP Union_NNP ._.
+Nedelya_NNP 's_POS article_NN was_VBD accompanied_VBN by_IN a_DT picture_NN of_IN Mr._NNP Lutsenko_NNP interviewing_VBG singer_NN John_NNP Denver_NNP in_IN Colorado_NNP ._.
+Even_RB though_IN it_PRP will_MD be_VB independent_JJ of_IN official_JJ television_NN ,_, Nika_NNP will_MD have_VB an_DT oversight_NN board_NN that_WDT will_MD include_VB members_NNS of_IN the_DT Communist_NNP youth_NN league_NN ._.
+South_NNP Africa_NNP 's_POS National_NNP Union_NNP of_IN Mineworkers_NNPS said_VBD that_IN about_IN 10,000_CD diamond_NN miners_NNS struck_VBN for_IN higher_JJR wages_NNS at_IN De_NNP Beers_NNP Consolidated_NNP Mines_NNPS Ltd._NNP
+De_NNP Beers_NNP said_VBD that_IN workers_NNS at_IN five_CD of_IN the_DT group_NN 's_POS mines_NNS were_VBD on_IN strike_NN ,_, which_WDT it_PRP said_VBD was_VBD peaceful_JJ ,_, with_IN orderly_JJ picketing_NN occurring_VBG at_IN one_CD of_IN the_DT mines_NNS ._.
+The_DT deadlock_NN in_IN negotiations_NNS occurred_VBD with_IN De_NNP Beers_NNP offering_VBG a_DT 17_CD %_NN increase_NN in_IN the_DT minimum-wage_NN category_NN while_IN the_DT union_NN demanded_VBD a_DT 37.6_CD %_NN increase_NN in_IN the_DT minimum_JJ wage_NN ._.
+Japan_NNP 's_POS opposition_NN Socialist_NNP Party_NNP denied_VBD that_IN its_PRP$ legislators_NNS had_VBD been_VBN bribed_VBN by_IN pinball-parlor_NN owners_NNS ._.
+The_DT allegation_NN had_VBD been_VBN raised_VBN in_IN Parliament_NNP by_IN the_DT governing_VBG Liberal_NNP Democratic_NNP Party_NNP following_VBG magazine_NN reports_NNS suggesting_VBG that_DT money_NN from_IN Japanese-style_JJ pinball_NN ,_, called_VBN pachinko_NN ,_, had_VBD infiltrated_VBN politics_NNS ._.
+Tsuruo_NNP Yamaguchi_NNP ,_, secretary_NN general_NN of_IN the_DT Socialist_NNP Party_NNP ,_, acknowledged_VBD that_IN nine_CD party_NN lawmakers_NNS had_VBD received_VBN donations_NNS from_IN the_DT pachinko_NN association_NN totaling_VBG 8_CD million_CD yen_NN -LRB-_-LRB- about_IN $_$ 55,000_CD -RRB-_-RRB- but_CC said_VBD the_DT donations_NNS were_VBD legal_JJ and_CC none_NN of_IN its_PRP$ members_NNS acted_VBD to_TO favor_VB the_DT industry_NN ._.
+The_DT World_NNP Wide_NNP Fund_NNP for_IN Nature_NNP said_VBD that_IN Spain_NNP ,_, Argentina_NNP ,_, Thailand_NNP and_CC Indonesia_NNP were_VBD doing_VBG too_RB little_JJ to_TO prevent_VB illegal_JJ trade_NN in_IN endangered_VBN wildlife_NN across_IN their_PRP$ borders_NNS ._.
+A_DT report_NN by_IN the_DT conservation_NN group_NN presented_VBN at_IN the_DT U.N.-sponsored_JJ Convention_NNP on_IN International_NNP Trade_NNP in_IN Endangered_NNP Species_NNP in_IN Lausanne_NNP accused_VBD the_DT four_CD of_IN trading_VBG protected_VBN species_NNS ranging_VBG from_IN parakeets_NNS to_TO orchids_NNS ._.
+Fund_NNP official_NN Simon_NNP Lyster_NNP said_VBD world_NN trade_NN in_IN wildlife_NN was_VBD estimated_VBN to_TO total_VB $_$ 5_CD billion_CD of_IN business_NN annually_RB ._.
+A_DT NATO_NNP project_NN to_TO build_VB a_DT frigate_NN for_IN the_DT 1990s_CD was_VBD torpedoed_VBN by_IN the_DT pull-out_NN of_IN three_CD of_IN its_PRP$ eight_CD participating_VBG nations_NNS ._.
+Britain_NNP ,_, France_NNP and_CC Italy_NNP announced_VBD technical_JJ reasons_NNS for_IN withdrawing_VBG ,_, but_CC some_DT officials_NNS pointed_VBD to_TO growing_VBG reluctance_NN among_IN the_DT allies_NNS to_TO commit_VB themselves_PRP to_TO big_JJ defense_NN spending_NN while_IN East-West_NNP disarmament_NN talks_NNS show_VBP signs_NNS of_IN success_NN ._.
+Small_JJ wonder_NN that_IN Britain_NNP 's_POS Labor_NNP Party_NNP wants_VBZ credit_NN controls_NNS ._.
+A_DT few_JJ hours_NNS after_IN the_DT party_NN launched_VBD its_PRP$ own_JJ affinity_NN credit_NN card_NN earlier_RBR this_DT month_NN ,_, the_DT Tories_NNS raised_VBD the_DT nation_NN 's_POS base_NN interest_NN rate_NN ._.
+Labor_NNP 's_POS Visa_NNP card_NN is_VBZ believed_VBN to_TO be_VB the_DT first_RB linked_VBN to_TO a_DT British_JJ political_JJ party_NN ._.
+Labor_NNP gets_VBZ 25_CD pence_NN -LRB-_-LRB- 39_CD cents_NNS -RRB-_-RRB- for_IN every_DT 100_CD -LRB-_-LRB- about_IN $_$ 155_CD -RRB-_-RRB- that_IN a_DT user_NN charges_VBZ to_TO the_DT card_NN ._.
+As_IN with_IN other_JJ plastic_NN in_IN Britain_NNP 's_POS high-interest-rate_JJ environment_NN ,_, the_DT Labor_NNP card_NN ,_, administered_VBN by_IN Co-operative_NNP Bank_NNP ,_, carries_VBZ a_DT stiff_JJ -LRB-_-LRB- in_IN this_DT case_NN ,_, 29.8_CD %_NN -RRB-_-RRB- annual_JJ rate_NN on_IN the_DT unpaid_JJ balance_NN ._.
+China_NNP 's_POS year-long_JJ austerity_NN program_NN has_VBZ achieved_VBN some_DT successes_NNS in_IN harnessing_VBG runaway_JJ economic_JJ growth_NN and_CC stabilizing_VBG prices_NNS but_CC has_VBZ failed_VBN to_TO eliminate_VB serious_JJ defects_NNS in_IN state_NN planning_NN and_CC an_DT alarming_VBG drain_NN on_IN state_NN budgets_NNS ._.
+The_DT official_JJ China_NNP Daily_NNP said_VBD retail_JJ prices_NNS of_IN non-staple_JJ foods_NNS have_VBP n't_RB risen_VBN since_IN last_JJ December_NNP but_CC acknowledged_VBD that_DT huge_JJ government_NN subsidies_NNS were_VBD a_DT main_JJ factor_NN in_IN keeping_VBG prices_NNS down_IN ._.
+The_DT State_NNP Statistical_NNP Bureau_NNP found_VBD that_IN more_RBR than_IN 1_CD billion_CD yuan_NN -LRB-_-LRB- $_$ 270_CD million_CD -RRB-_-RRB- was_VBD spent_VBN in_IN the_DT first_JJ half_DT of_IN the_DT year_NN for_IN pork_NN subsidies_NNS ._.
+The_DT newspaper_NN quoted_VBD experts_NNS as_IN saying_VBG the_DT subsidies_NNS would_MD cause_VB the_DT difference_NN between_IN prices_NNS and_CC real_JJ values_NNS of_IN commodities_NNS to_TO ``_`` become_VB very_RB unreasonable_JJ ''_'' and_CC reduce_VB needed_VBN funds_NNS for_IN investment_NN in_IN the_DT ``_`` already_RB difficult_JJ state_NN budget_NN ._. ''_''
+The_DT aim_NN of_IN the_DT austerity_NN measures_NNS was_VBD to_TO slice_VB economic_JJ growth_NN ,_, which_WDT soared_VBD to_TO 20.7_CD %_NN last_JJ year_NN ,_, to_TO 8_CD %_NN in_IN 1990_CD ._.
+Economists_NNS now_RB predict_VBP the_DT growth_NN rate_NN will_MD be_VB about_IN 11.5_CD %_NN for_IN the_DT year_NN ._.
+In_IN a_DT sign_NN of_IN growing_VBG official_JJ tolerance_NN for_IN religion_NN ,_, Russian_NNP Orthodox_NNP priests_NNS were_VBD allowed_VBN to_TO celebrate_VB the_DT 400th_JJ anniversary_NN of_IN the_DT Moscow_NNP patriarchate_NN in_IN the_DT Kremlin_NNP 's_POS 15th-century_JJ Uspensky_NNP Cathedral_NNP ,_, where_WRB czars_NNS were_VBD crowned_VBN ..._: ._.
+A_DT 34-foot-tall_JJ ,_, $_$ 7.7_CD million_CD statue_NN of_IN Buddha_NNP was_VBD completed_VBN on_IN a_DT hill_NN outside_IN Hong_NNP Kong_NNP ,_, facing_VBG China_NNP ._.
+The_DT statue_NN is_VBZ the_DT brainchild_NN of_IN Sik_NNP Chi_NNP Wan_NNP ,_, director_NN of_IN the_DT Po_NNP Lin_NNP Monastery_NNP ,_, who_WP said_VBD :_: ``_`` Hong_NNP Kong_NNP is_VBZ such_JJ a_DT prosperous_JJ place_NN ,_, we_PRP also_RB need_VBP some_DT kind_NN of_IN religious_JJ symbol_NN ._.
+It_PRP all_DT seemed_VBD innocent_JJ enough_RB :_: Last_JJ April_NNP ,_, one_CD Steven_NNP B._NNP Iken_NNP visited_VBD Justin_NNP Products_NNPS Inc._NNP here_RB ,_, identified_VBD himself_PRP as_IN a_DT potential_JJ customer_NN and_CC got_VBD the_DT word_NN on_IN the_DT little_JJ company_NN 's_POS new_JJ cassette_NN players_NNS for_IN children_NNS ._.
+``_`` It_PRP is_VBZ almost_RB identical_JJ to_TO the_DT Sony_NNP product_NN ,_, ''_'' Mr._NNP Iken_NNP remarked_VBD ,_, after_IN seeing_VBG prototypes_NNS and_CC pictures_NNS ._.
+Replied_VBD a_DT Justin_NNP salesman_NN :_: ``_`` Exactly_RB ._. ''_''
+The_DT Justin_NNP merchandise_NN carried_VBD wholesale_JJ prices_NNS some_DT 40_CD %_NN below_IN those_DT of_IN Sony_NNP Corp._NNP of_IN Japan_NNP 's_POS ``_`` My_NNP First_NNP Sony_NNP ''_'' line_NN ._.
+The_DT visitor_NN waxed_VBD enthusiastic_JJ and_CC promised_VBD to_TO return_VB ._.
+But_CC instead_RB of_IN a_DT new_JJ customer_NN --_: part_NN of_IN a_DT hoped-for_JJ bonanza_NN from_IN underselling_VBG Sony_NNP --_: Justin_NNP got_VBD a_DT costly_JJ legal_JJ morass_NN ._.
+Mr._NNP Iken_NNP ,_, it_PRP turned_VBD out_RP ,_, was_VBD a_DT private_JJ detective_NN using_VBG a_DT hidden_VBN tape_NN recorder_NN to_TO gather_VB information_NN for_IN Sony_NNP ._.
+His_PRP$ recording_NN later_RB turned_VBD up_RP as_IN a_DT court_NN exhibit_NN ._.
+Seeking_VBG to_TO keep_VB Justin_NNP 's_POS ``_`` My_NNP Own_NNP ''_'' product_NN line_NN off_IN the_DT U.S._NNP market_NN ,_, Sony_NNP last_JJ May_NNP filed_VBD a_DT suit_NN in_IN Manhattan_NNP federal_JJ court_NN accusing_VBG the_DT upstart_NN of_IN trademark_NN infringement_NN ,_, unfair_JJ competition_NN and_CC other_JJ violations_NNS of_IN business_NN law_NN ._.
+Since_IN then_RB ,_, life_NN has_VBZ changed_VBN a_DT lot_NN for_IN 61-year-old_JJ Leonard_NNP Kaye_NNP ,_, Justin_NNP 's_POS owner_NN ._.
+``_`` I_PRP have_VBP n't_RB been_VBN able_JJ to_TO get_VB a_DT decent_JJ night_NN 's_POS sleep_NN since_IN this_DT has_VBZ been_VBN going_VBG on_IN ,_, ''_'' he_PRP says_VBZ ._.
+``_`` It_PRP 's_VBZ the_DT most_RBS distracting_VBG thing_NN in_IN my_PRP$ life_NN --_: I_PRP ca_MD n't_RB even_RB attend_VB to_TO my_PRP$ business_NN ._. ''_''
+His_PRP$ company_NN -LRB-_-LRB- annual_JJ sales_NNS :_: about_IN $_$ 25_CD million_CD -RRB-_-RRB- may_MD suffer_VB a_DT costly_JJ blow_NN --_: losing_VBG an_DT estimated_VBN 10_CD %_NN of_IN total_JJ sales_NNS --_: if_IN Sony_NNP -LRB-_-LRB- annual_JJ sales_NNS :_: about_IN $_$ 16_CD billion_CD -RRB-_-RRB- prevails_VBZ ._.
+Justin_NNP 's_POS plight_NN shows_VBZ what_WP can_MD happen_VB when_WRB a_DT tiny_JJ company_NN suddenly_RB faces_VBZ the_DT full_JJ legal_JJ might_NN of_IN a_DT wrathful_JJ multinational_JJ ._.
+With_IN considerable_JJ irony_NN ,_, the_DT case_NN also_RB shows_VBZ how_WRB completely_RB Japan_NNP has_VBZ turned_VBN the_DT tables_NNS on_IN U.S._NNP business_NN ._.
+Americans_NNPS used_VBD to_TO complain_VB bitterly_RB about_IN being_VBG undersold_NN by_IN look-alike_JJ products_NNS from_IN Japan_NNP ._.
+Now_RB Sony_NNP ,_, whose_WP$ innovative_JJ ,_, premium-priced_JJ products_NNS are_VBP among_IN the_DT most_RBS admired_VBN in_IN consumer_NN electronics_NNS ,_, is_VBZ bitterly_RB complaining_VBG about_IN a_DT little_JJ U.S._NNP firm_NN with_IN a_DT cheap_JJ look-alike_NN produced_VBN in_IN China_NNP ._.
+``_`` The_DT gist_NN of_IN this_DT is_VBZ that_DT Justin_NNP knocked_VBD off_RP the_DT Sony_NNP line_NN and_CC Sony_NNP wants_VBZ to_TO stop_VB it_PRP ,_, ''_'' says_VBZ Lewis_NNP H._NNP Eslinger_NNP ,_, Sony_NNP 's_POS attorney_NN ,_, who_WP previously_RB guarded_VBD Rubik_NNP 's_POS Cube_NNP ._.
+-LRB-_-LRB- Sony_NNP itself_PRP declines_VBZ to_TO comment_VB ._. -RRB-_-RRB-
+If_IN Sony_NNP wins_VBZ ,_, Mr._NNP Eslinger_NNP says_VBZ ,_, its_PRP$ little_JJ rival_NN will_MD have_VB to_TO try_VB to_TO sell_VB the_DT products_NNS overseas_RB ._.
+At_IN worst_JJS ,_, he_PRP adds_VBZ ,_, ``_`` They_PRP 'd_MD have_VB to_TO grind_VB them_PRP all_DT up_IN and_CC throw_VB them_PRP away_RB ._. ''_''
+Mr._NNP Kaye_NNP denies_VBZ the_DT suit_NN 's_POS charges_NNS and_CC says_VBZ his_PRP$ only_JJ mistake_NN was_VBD taking_VBG on_RP Sony_NNP in_IN the_DT marketplace_NN ._.
+``_`` I_PRP made_VBD a_DT similar_JJ line_NN and_CC I_PRP produced_VBD it_PRP cheaper_JJR ,_, ''_'' he_PRP says_VBZ ._.
+Today_NN ,_, U.S._NNP Judge_NNP John_NNP E._NNP Sprizzo_NNP is_VBZ expected_VBN to_TO rule_VB on_IN Sony_NNP 's_POS renewed_VBN request_NN for_IN a_DT pre-trial_JJ order_NN blocking_VBG sale_NN of_IN the_DT disputed_VBN products_NNS ,_, on_IN which_WDT deliveries_NNS began_VBD in_IN July_NNP ._.
+The_DT judge_NN turned_VBD down_RP an_DT earlier_JJR Sony_NNP request_NN for_IN such_PDT an_DT order_NN --_: a_DT decision_NN upheld_VBN on_IN appeal_NN --_: but_CC Sony_NNP returned_VBD with_IN additional_JJ evidence_NN and_CC arguments_NNS ._.
+Though_IN hoping_VBG to_TO settle_VB the_DT case_NN ,_, Justin_NNP vows_VBZ to_TO fight_VB on_IN ,_, if_IN necessary_JJ ._.
+But_CC the_DT battle_NN is_VBZ more_JJR than_IN Justin_NNP bargained_VBD for_IN ._.
+``_`` I_PRP had_VBD no_DT idea_NN I_PRP was_VBD getting_VBG in_IN so_RB deep_JJ ,_, ''_'' says_VBZ Mr._NNP Kaye_NNP ,_, who_WP founded_VBD Justin_NNP in_IN 1982_CD ._.
+Mr._NNP Kaye_NNP had_VBD sold_VBN Capetronic_NNP Inc._NNP ,_, a_DT Taiwan_NNP electronics_NNS maker_NN ,_, and_CC retired_VBD ,_, only_RB to_TO find_VB he_PRP was_VBD bored_VBN ._.
+With_IN Justin_NNP ,_, he_PRP began_VBD selling_VBG toys_NNS and_CC electronics_NNS made_VBN mostly_RB in_IN Hong_NNP Kong_NNP ,_, beginning_NN with_IN Mickey_NNP Mouse_NNP radios_NNS ._.
+The_DT company_NN has_VBZ grown_VBN --_: to_TO about_IN 40_CD employees_NNS ,_, from_IN four_CD initially_RB ,_, Mr._NNP Kaye_NNP says_VBZ ._.
+Justin_NNP has_VBZ been_VBN profitable_JJ since_IN 1986_CD ,_, adds_VBZ the_DT official_NN ,_, who_WP shares_VBZ his_PRP$ office_NN with_IN numerous_JJ teddy_NN bears_VBZ ,_, all_DT samples_NNS from_IN his_PRP$ line_NN of_IN plush_JJ toys_NNS ._.
+Like_IN many_JJ others_NNS ,_, Mr._NNP Kaye_NNP took_VBD notice_NN in_IN 1987_CD when_WRB Sony_NNP ,_, in_IN a_DT classic_JJ example_NN of_IN market_NN segmentation_NN ,_, changed_VBD the_DT plastic_JJ skin_NN and_CC buttons_NNS on_IN the_DT famous_JJ Walkman_NNP line_NN of_IN portable_JJ audio_JJ equipment_NN and_CC created_VBD the_DT My_NNP First_NNP Sony_NNP line_NN for_IN children_NNS ._.
+The_DT brightly_RB colored_VBN new_JJ products_NNS looked_VBD more_JJR like_IN toys_NNS than_IN the_DT adult_NN models_NNS ._.
+-LRB-_-LRB- In_IN court_NN papers_NNS ,_, Sony_NNP says_VBZ it_PRP has_VBZ spent_VBN more_RBR than_IN $_$ 3_CD million_CD to_TO promote_VB the_DT line_NN ,_, with_IN resulting_VBG sales_NNS of_IN over_IN a_DT million_CD units_NNS ._. -RRB-_-RRB-
+Sony_NNP found_VBD a_DT new_JJ market_NN niche_NN ,_, but_CC Mr._NNP Kaye_NNP figured_VBD that_IN its_PRP$ prices_NNS left_VBD plenty_NN of_IN room_NN for_IN a_DT lower-priced_JJ competitor_NN ._.
+
