@@ -242,7 +242,7 @@ class SpeechTagger2Gram(object):
 		print "Parsing test file " + path
 		testArrays = self.parseTestFile(path)
 		tokens = testArrays[0]
-		fileWords = testArrays[1][0:100]
+		fileWords = testArrays[1]
 		POS = testArrays[2]
 		testCounts = testArrays[3]
 		

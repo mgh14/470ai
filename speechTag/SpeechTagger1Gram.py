@@ -243,7 +243,7 @@ class SpeechTagger1Gram(object):
 		print "Parsing test file \'" + path + "\'"
 		testArrays = self.parseTestFile(path)
 		tokens = testArrays[0]
-		fileWords = testArrays[1][0:100]
+		fileWords = testArrays[1]
 		POS = testArrays[2]
 		testCounts = testArrays[3]
 		
@@ -251,7 +251,7 @@ class SpeechTagger1Gram(object):
 		print str(len(fileWords)) + " words to be classified from " + self.TEST_PATH
 		print "Running Viterbi..."
 		startTime = time.time()
-		(prob, tags) = self.viterbi(fileWords[0:100],self.POSdict,self.HMMstartProbability,self.HMMtransition,self.HMMemission)
+		(prob, tags) = self.viterbi(fileWords,self.POSdict,self.HMMstartProbability,self.HMMtransition,self.HMMemission)
 		print "Finished classifying in " + str(time.time() - startTime) + " seconds."
 		
 		# print out statistics
