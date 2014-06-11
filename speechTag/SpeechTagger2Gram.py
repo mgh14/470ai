@@ -2,7 +2,7 @@
 import random
 import math
 import time
-
+import sys
 class SpeechTagger2Gram(object):
 	
 	# Member constants
@@ -24,6 +24,7 @@ class SpeechTagger2Gram(object):
 		self.HMMstartProbability = {}
 		self.totalPOScount = {}
 		self.transitionTotal = {}
+		self.defaultProb = .00001
 
 		self.train(self.DATA_FOLDER + self.TRAIN_PATH)
 
@@ -123,14 +124,54 @@ class SpeechTagger2Gram(object):
 			for word in self.HMMemission[key]:
 				total += self.HMMemission[key][word]
 			self.totalPOScount[key] = total
-			
+		
 		for key in self.HMMemission:
 			for word in self.HMMemission[key]:
 				self.HMMemission[key][word] /= float(self.totalPOScount[key])
 
 		print "Training finished in " + str(time.time() - startTime) + " seconds"
-		#print self.HMMtransition.keys()	
 		
+	def viterbi(self, wordSequence, states, startProbs, transProbs, emitProbs):	
+		origTime = time.time()
+		V = {0:{}}
+		path = {}
+
+		for state1 in states:
+			for state2 in states:
+				startProb = startProbs.get((state1, state2), self.defaultProb)
+				V[0][(state1,state2)] = math.log(startProb) + math.log(emitProbs.get(wordSequence[0], self.defaultProb))
+				path[(state1,state2)] = [state1]
+
+		for k in xrange(1,len(wordSequence)):
+			if(k % 5 == 0):
+				print "Calculating t=" + str(k) + " (" + str(time.time()-origTime) + " seconds elapsed)..."
+			V[k] = {}
+			newpath = {}
+			for prevState in states:
+				for currState in states:
+					# calculate highest probability and associated 
+					# argmax (which state provides highest probability)
+					(prob, state) = max((V[k-1][(twoPrevState,prevState)] + math.log(transProbs.get((twoPrevState,prevState),{}).get(currState,self.defaultProb)) + math.log(emitProbs[currState].get(wordSequence[k], self.defaultProb)), twoPrevState) for twoPrevState in states)
+
+					#print "states: " + prevState + "; " + currState + " " + state
+					# update probabilities and state paths
+					V[k][(prevState,currState)] = prob
+					#newpath[(prevState,currState)] = path[(prevState,currState)] + [state]
+					newpath[(prevState,currState)] = path[(currState,state)] + [currState]
+					#print "newpath: " + str(newpath[(prevState,currState)]) + "===== " + str(state)
+			
+			path = newpath
+			#print "final: " + str(path)
+			#if(k > 5):
+			#	sys.exit(0)
+			n = 0
+			if len(wordSequence) != 1:
+				n = k
+		
+		(prob, x, y) = max((V[n][(x,y)], x, y) for x in states for y in states)
+		#sys.exit(0)
+		return (prob, path[(x,y)]) 
+
 	def generateText(self, nGramSeed, numWordsToGenerate):
 		print
 		
@@ -162,50 +203,11 @@ class SpeechTagger2Gram(object):
 		for prob in probabilitiesList:
 			prob[1] = float(prob[1]) / float(total)
 		
-		#print total
-		#print probabilitiesList
-			
-	
 		r, s = random.random(), 0
 		for num in probabilitiesList:
 			s += num[1]
 			if s >= r:
-				return num[0]
-
-	def viterbi(self, wordSequence, states, startProbs, transProbs, emitProbs):
-		V = {0:{}}
-		path = {}
-		defaultProb = 0.000000001
-		for state1 in states:
-			for state2 in states:
-				startProb = startProbs.get((state1,state2),defaultProb)
-				V[0][(state1,state2)] = math.log(startProb) + math.log(emitProbs[state2].get(wordSequence[0], defaultProb))
-				path[(state1,state2)] = [state1,state2]
-		
-		for t in xrange(1,len(wordSequence)):
-			V[t] = {}
-			newpath = {}
-
-
-			for currState in states:
-				for prevState in states:
-					
-					(prob, state) = max((V[t-1][(innerState,prevState)] + math.log(transProbs.get((innerState,prevState),{}).get(currState,defaultProb)) + math.log(emitProbs[currState].get(wordSequence[t], defaultProb)), innerState) for innerState in states)
-					
-					V[t][(prevState,currState)] = prob
-					#print state
-					newpath[(prevState,currState)] = path[(prevState,state)] + [prevState,currState]
-			
-			path = newpath
-			
-			n = 0
-			if len(wordSequence) != 1:
-				n = t
-		
-		(prob, x, y) = max((V[n][(x,y)], x, y ) for x in states for y in states)
-		return (prob, path[(x,y)]) 
-
-											
+				return num[0]					
 
 	def parseTestFile(self, filepath):
 		fileStr = ""
@@ -242,7 +244,7 @@ class SpeechTagger2Gram(object):
 		print "Parsing test file " + path
 		testArrays = self.parseTestFile(path)
 		tokens = testArrays[0]
-		fileWords = testArrays[1]
+		fileWords = testArrays[1][0:100]
 		POS = testArrays[2]
 		testCounts = testArrays[3]
 		
