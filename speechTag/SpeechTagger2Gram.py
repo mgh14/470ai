@@ -187,20 +187,20 @@ class SpeechTagger2Gram(object):
 			newpath = {}
 
 
-			for currState in states:
-				for prevState in states:
+			for nextState in states:
+				for currState in states:
 					
-					(prob, state) = max((V[t-1][(innerState,prevState)] + math.log(transProbs.get((innerState,prevState),{}).get(currState,defaultProb)) + math.log(emitProbs[currState].get(wordSequence[t], defaultProb)), innerState) for innerState in states)
+					(prob, pState) = max((V[t-1][(prevState,currState)] + math.log(transProbs.get((prevState,currState),{}).get(nextState,defaultProb)) + math.log(emitProbs[nextState].get(wordSequence[t], defaultProb)), prevState) for prevState in states)
 					
-					V[t][(prevState,currState)] = prob
+					V[t][(currState,nextState)] = prob
 					#print state
-					newpath[(prevState,currState)] = path[(prevState,state)] + [prevState,currState]
+					newpath[(currState,nextState)] = path[(pState,currState)] + [currState,nextState]
 			
 			path = newpath
 			
-			n = 0
-			if len(wordSequence) != 1:
-				n = t
+		n = 0
+		if len(wordSequence) != 1:
+			n = t
 		
 		(prob, x, y) = max((V[n][(x,y)], x, y ) for x in states for y in states)
 		return (prob, path[(x,y)]) 
@@ -242,7 +242,7 @@ class SpeechTagger2Gram(object):
 		print "Parsing test file " + path
 		testArrays = self.parseTestFile(path)
 		tokens = testArrays[0]
-		fileWords = testArrays[1]
+		fileWords = testArrays[1][0:100]
 		POS = testArrays[2]
 		testCounts = testArrays[3]
 		
