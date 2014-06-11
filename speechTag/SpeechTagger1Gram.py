@@ -182,27 +182,27 @@ class SpeechTagger1Gram(object):
 			path[state] = [state]
 	 
 		# Run Viterbi for t > 0
-		for t in range(1, len(wordSequence)):
-			if(t % 10000 == 0):
-				print "Calculating t=" + str(t) + " (" + str(time.time()-origTime) + " seconds elapsed)..."
-			V[t] = {}
+		for k in range(1, len(wordSequence)):
+			if(k % 10000 == 0):
+				print "Calculating k=" + str(k) + " (" + str(time.time()-origTime) + " seconds elapsed)..."
+			V[k] = {}
 			newpath = {}
 			
-			for outerState in states:				
-				transitionConst = .1 / self.transitionTotal[(outerState,)]
+			for currState in states:				
+				transitionConst = .1 / self.transitionTotal[(currState,)]
 				emitConst = .1 / self.totalPOScount[outerState]
 
-				(prob, state) = max((V[t-1][innerState] + math.log(transProbs[(innerState,)].get(outerState,transitionConst)) + math.log(emitProbs[outerState].get(wordSequence[t], emitConst)), innerState) for innerState in states)
+				(prob, state) = max((V[k-1][prevState] + math.log(transProbs[(prevState,)].get(currState,transitionConst)) + math.log(emitProbs[currState].get(wordSequence[k], emitConst)), prevState) for prevState in states)
 
-				V[t][outerState] = prob
-				newpath[outerState] = path[state] + [outerState]
+				V[k][currState] = prob
+				newpath[currState] = path[state] + [currState]
 	 
 			# Don't need to remember the old paths
 			path = newpath
 
 			n = 0 	# if only one element is observed max is sought in the initialization values
 			if len(wordSequence)!=1:
-				n = t
+				n = k
 
 		(prob, state) = max((V[n][state], state) for state in states)
 		return (prob, path[state])
