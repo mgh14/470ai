@@ -109,6 +109,7 @@ class SpeechTagger2Gram(object):
 		
 		for key in self.HMMstartProbability:
 			self.HMMstartProbability[key] /= float(len(self.POS))
+
 		
 		for key in self.HMMtransition:
 			for posKey in self.HMMtransition[key]:
@@ -140,7 +141,10 @@ class SpeechTagger2Gram(object):
 			for state2 in states:
 				startProb = startProbs.get((state1, state2), self.defaultProb)
 				V[0][(state1,state2)] = math.log(startProb) + math.log(emitProbs.get(wordSequence[0], self.defaultProb))
-				path[(state1,state2)] = [state1]
+		
+		for state2 in states:
+			(prob, state1) = max((V[0][(state1,state2)], state1) for state1 in states)
+			path[state2] = [state1,state2]
 
 		for k in xrange(1,len(wordSequence)):
 			if(k % 5 == 0):
@@ -157,20 +161,24 @@ class SpeechTagger2Gram(object):
 					# update probabilities and state paths
 					V[k][(prevState,currState)] = prob
 					#newpath[(prevState,currState)] = path[(prevState,currState)] + [state]
-					newpath[(prevState,currState)] = path[(currState,state)] + [currState]
-					#print "newpath: " + str(newpath[(prevState,currState)]) + "===== " + str(state)
+					#print "path: " + str(path[prevState]) + "===== " + str(currState)
+			for nextState in states:
+				(prob, lastState) = max((V[k][(lastState,nextState)], lastState) for lastState in states)
+				newpath[nextState] = path[lastState] + [nextState]
+
 			
 			path = newpath
 			#print "final: " + str(path)
 			#if(k > 5):
 			#	sys.exit(0)
-			n = 0
-			if len(wordSequence) != 1:
-				n = k
+		n = 0
+		if len(wordSequence) != 1:
+			n = k
 		
 		(prob, x, y) = max((V[n][(x,y)], x, y) for x in states for y in states)
 		#sys.exit(0)
-		return (prob, path[(x,y)]) 
+		print path[y]
+		return (prob, path[y]) 
 
 	def generateText(self, nGramSeed, numWordsToGenerate):
 		print
