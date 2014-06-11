@@ -85,6 +85,12 @@ class SpeechTagger2Gram(object):
 					nextPOScounts[nextPOS] = 1
 				self.HMMtransition[nGram] = nextPOScounts
 				
+				#start prob
+				if self.HMMstartProbability.has_key(nGram):
+					self.HMMstartProbability[nGram] += 1
+				else:
+					self.HMMstartProbability[nGram] = 1
+				
 			##############################################
 			# Build HMM emission  and start probability  #
 			##############################################
@@ -98,11 +104,7 @@ class SpeechTagger2Gram(object):
 					posWordCounts[word] = 1
 				self.HMMemission[pos] = posWordCounts
 				
-				#start prob
-				if self.HMMstartProbability.has_key(pos):
-					self.HMMstartProbability[pos] = self.HMMstartProbability[pos] + 1
-				else:
-					self.HMMstartProbability[pos] = 1
+				
 		
 		for key in self.HMMstartProbability:
 			self.HMMstartProbability[key] /= float(len(self.POS))
@@ -126,7 +128,8 @@ class SpeechTagger2Gram(object):
 			for word in self.HMMemission[key]:
 				self.HMMemission[key][word] /= float(self.totalPOScount[key])
 
-		print "Training finished in " + str(time.time() - startTime) + " seconds"		
+		print "Training finished in " + str(time.time() - startTime) + " seconds"
+		#print self.HMMtransition.keys()	
 		
 	def generateText(self, nGramSeed, numWordsToGenerate):
 		print
@@ -170,42 +173,39 @@ class SpeechTagger2Gram(object):
 				return num[0]
 
 	def viterbi(self, wordSequence, states, startProbs, transProbs, emitProbs):
-		origTime = time.time()
-		V = {0: {}}
+		V = {0:{}}
 		path = {}
-	 
-		# Initialize base cases (t = 0)
-		for state in states:
-			#V[0][state] = start_p[state] * emit_p[state].get(obs[0], 0.1/self.totalPOScount[state])
-			smoothingConst = .1 / self.totalPOScount[state]
-			V[0][state] = math.log(startProbs[state]) + math.log(emitProbs[state].get(wordSequence[0], smoothingConst))
-			path[state] = [state]
-	 
-		# Run Viterbi for t > 0
-		for t in range(1, len(wordSequence)):
-			if(t % 10000 == 0):
-				print "Calculating t=" + str(t) + " (" + str(time.time()-origTime) + " seconds elapsed)..."
+		defaultProb = 0.000000001
+		for state1 in states:
+			for state2 in states:
+				startProb = startProbs.get((state1,state2),defaultProb)
+				V[0][(state1,state2)] = math.log(startProb) + math.log(emitProbs[state2].get(wordSequence[0], defaultProb))
+				path[(state1,state2)] = [state1,state2]
+		
+		for t in xrange(1,len(wordSequence)):
 			V[t] = {}
 			newpath = {}
+
+
+			for currState in states:
+				for prevState in states:
+					
+					(prob, state) = max((V[t-1][(innerState,prevState)] + math.log(transProbs.get((innerState,prevState),{}).get(currState,defaultProb)) + math.log(emitProbs[currState].get(wordSequence[t], defaultProb)), innerState) for innerState in states)
+					
+					V[t][(prevState,currState)] = prob
+					#print state
+					newpath[(prevState,currState)] = path[(prevState,state)] + [prevState,currState]
 			
-			for outerState in states:				
-				transitionConst = .1 / self.transitionTotal[(outerState,)]
-				emitConst = .1 / self.totalPOScount[outerState]
-
-				(prob, state) = max((V[t-1][innerState] + math.log(transProbs[(innerState,)].get(outerState,transitionConst)) + math.log(emitProbs[outerState].get(wordSequence[t], emitConst)), innerState) for innerState in states)
-
-				V[t][outerState] = prob
-				newpath[outerState] = path[state] + [outerState]
-	 
-			# Don't need to remember the old paths
 			path = newpath
-
-			n = 0 	# if only one element is observed max is sought in the initialization values
-			if len(wordSequence)!=1:
+			
+			n = 0
+			if len(wordSequence) != 1:
 				n = t
+		
+		(prob, x, y) = max((V[n][(x,y)], x, y ) for x in states for y in states)
+		return (prob, path[(x,y)]) 
 
-		(prob, state) = max((V[n][state], state) for state in states)
-		return (prob, path[state])
+											
 
 	def parseTestFile(self, filepath):
 		fileStr = ""
