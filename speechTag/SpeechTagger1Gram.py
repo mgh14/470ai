@@ -190,7 +190,7 @@ class SpeechTagger1Gram(object):
 			
 			for currState in states:				
 				transitionConst = .1 / self.transitionTotal[(currState,)]
-				emitConst = .1 / self.totalPOScount[outerState]
+				emitConst = .1 / self.totalPOScount[currState]
 
 				(prob, state) = max((V[k-1][prevState] + math.log(transProbs[(prevState,)].get(currState,transitionConst)) + math.log(emitProbs[currState].get(wordSequence[k], emitConst)), prevState) for prevState in states)
 
@@ -257,15 +257,50 @@ class SpeechTagger1Gram(object):
 		# print out statistics
 		counter = 0
 		counts = {}
+		misClassified = {}
+		correctClassified = {}
 		for a in range(0,len(tags)-1):
-			if(tags[a] != testArrays[2][a]):
+			tag = tags[a]
+			correctTag = POS[a]
+			if(tag != correctTag):
 				counter += 1
-			
-			if tags[a] in counts:
-				counts[tags[a]] += 1
+
+				if(correctTag in misClassified.keys()):
+					if(tag in misClassified[correctTag]):
+						misClassified[correctTag][tag] += 1
+					else:
+						misClassified[correctTag][tag] = 1
+				else:
+					misClassified[correctTag] = {}
+					misClassified[correctTag][tag] = 1
 			else:
-				counts[tags[a]] = 1
-				
+				if(correctTag in correctClassified.keys()):
+					if(tag in correctClassified[correctTag]):
+						correctClassified[correctTag][tag] += 1
+					else:
+						correctClassified[correctTag][tag] = 1
+				else:
+					correctClassified[correctTag] = {}
+					correctClassified[correctTag][tag] = 1
+			
+			if tag in counts:
+				counts[tag] += 1
+			else:
+				counts[tag] = 1
+		
+		print "\nIncorrect Classifications:"
+		for key in misClassified:
+			print key + " classified as: "
+			for tag in misClassified[key]:
+				print "\t" + tag + ": " + str(misClassified[key][tag])
+
+		print "\nCorrect Classifications:"
+		for key in correctClassified:
+			print key + " classified as: " 
+			for tag in correctClassified[key]:
+				print "\t" + tag + ": " + str(correctClassified[key][tag])
+		
+		print "\nTotal Classifications:"
 		for key in testCounts:
 			val = 0
 			if key in counts:
