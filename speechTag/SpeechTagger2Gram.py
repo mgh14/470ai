@@ -141,10 +141,6 @@ class SpeechTagger2Gram(object):
 			for state2 in states:
 				startProb = startProbs.get((state1, state2), self.defaultProb)
 				V[0][(state1,state2)] = math.log(startProb) + math.log(emitProbs.get(wordSequence[0], self.defaultProb))
-		
-		for state2 in states:
-			(prob, state1) = max((V[0][(state1,state2)], state1) for state1 in states)
-			path[state2] = [state1,state2]
 
 		for k in xrange(1,len(wordSequence)):
 			if(k % 5 == 0):
@@ -157,28 +153,22 @@ class SpeechTagger2Gram(object):
 					# argmax (which state provides highest probability)
 					(prob, state) = max((V[k-1][(twoPrevState,prevState)] + math.log(transProbs.get((twoPrevState,prevState),{}).get(currState,self.defaultProb)) + math.log(emitProbs[currState].get(wordSequence[k], self.defaultProb)), twoPrevState) for twoPrevState in states)
 
-					#print "states: " + prevState + "; " + currState + " " + state
-					# update probabilities and state paths
 					V[k][(prevState,currState)] = prob
-					#newpath[(prevState,currState)] = path[(prevState,currState)] + [state]
-					#print "path: " + str(path[prevState]) + "===== " + str(currState)
+
 			for nextState in states:
 				(prob, lastState) = max((V[k][(lastState,nextState)], lastState) for lastState in states)
-				newpath[nextState] = path[lastState] + [nextState]
-
 			
-			path = newpath
-			#print "final: " + str(path)
-			#if(k > 5):
-			#	sys.exit(0)
 		n = 0
 		if len(wordSequence) != 1:
 			n = k
 		
-		(prob, x, y) = max((V[n][(x,y)], x, y) for x in states for y in states)
-		#sys.exit(0)
-		print path[y]
-		return (prob, path[y]) 
+		path = []
+		for n in range(1,len(V)):
+			state = V[n]
+			
+			(myprob, mykey) = max((state[key],key) for key in state.keys())
+			path += [mykey[0]]
+		return (prob, path) 
 
 	def generateText(self, nGramSeed, numWordsToGenerate):
 		print
@@ -252,7 +242,7 @@ class SpeechTagger2Gram(object):
 		print "Parsing test file " + path
 		testArrays = self.parseTestFile(path)
 		tokens = testArrays[0]
-		fileWords = testArrays[1][0:100]
+		fileWords = testArrays[1][0:200]
 		POS = testArrays[2]
 		testCounts = testArrays[3]
 		
@@ -266,15 +256,50 @@ class SpeechTagger2Gram(object):
 		# print out statistics
 		counter = 0
 		counts = {}
+		misClassified = {}
+		correctClassified = {}
 		for a in range(0,len(tags)-1):
-			if(tags[a] != testArrays[2][a]):
+			tag = tags[a]
+			correctTag = POS[a]
+			if(tag != correctTag):
 				counter += 1
-			
-			if tags[a] in counts:
-				counts[tags[a]] += 1
+
+				if(correctTag in misClassified.keys()):
+					if(tag in misClassified[correctTag]):
+						misClassified[correctTag][tag] += 1
+					else:
+						misClassified[correctTag][tag] = 1
+				else:
+					misClassified[correctTag] = {}
+					misClassified[correctTag][tag] = 1
 			else:
-				counts[tags[a]] = 1
-				
+				if(correctTag in correctClassified.keys()):
+					if(tag in correctClassified[correctTag]):
+						correctClassified[correctTag][tag] += 1
+					else:
+						correctClassified[correctTag][tag] = 1
+				else:
+					correctClassified[correctTag] = {}
+					correctClassified[correctTag][tag] = 1
+			
+			if tag in counts:
+				counts[tag] += 1
+			else:
+				counts[tag] = 1
+		
+		print "\nIncorrect Classifications:"
+		for key in misClassified:
+			print key + " classified as: "
+			for tag in misClassified[key]:
+				print "\t" + tag + ": " + str(misClassified[key][tag])
+
+		print "\nCorrect Classifications:"
+		for key in correctClassified:
+			print key + " classified as: " 
+			for tag in correctClassified[key]:
+				print "\t" + tag + ": " + str(correctClassified[key][tag])
+		
+		print "\nTotal Classifications:"		
 		for key in testCounts:
 			val = 0
 			if key in counts:
