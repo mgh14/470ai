@@ -135,7 +135,6 @@ class SpeechTagger2Gram(object):
 	def viterbi(self, wordSequence, states, startProbs, transProbs, emitProbs):	
 		origTime = time.time()
 		V = {0:{}}
-		path = {}
 
 		for state1 in states:
 			for state2 in states:
@@ -143,10 +142,9 @@ class SpeechTagger2Gram(object):
 				V[0][(state1,state2)] = math.log(startProb) + math.log(emitProbs.get(wordSequence[0], self.defaultProb))
 
 		for k in xrange(1,len(wordSequence)):
-			if(k % 5 == 0):
-				print "Calculating t=" + str(k) + " (" + str(time.time()-origTime) + " seconds elapsed)..."
+			if(k % 100 == 0):
+				print "Calculating k=" + str(k) + " (" + str(time.time()-origTime) + " seconds elapsed)..."
 			V[k] = {}
-			newpath = {}
 			for prevState in states:
 				for currState in states:
 					# calculate highest probability and associated 
@@ -154,9 +152,6 @@ class SpeechTagger2Gram(object):
 					(prob, state) = max((V[k-1][(twoPrevState,prevState)] + math.log(transProbs.get((twoPrevState,prevState),{}).get(currState,self.defaultProb)) + math.log(emitProbs[currState].get(wordSequence[k], self.defaultProb)), twoPrevState) for twoPrevState in states)
 
 					V[k][(prevState,currState)] = prob
-
-			for nextState in states:
-				(prob, lastState) = max((V[k][(lastState,nextState)], lastState) for lastState in states)
 			
 		n = 0
 		if len(wordSequence) != 1:
@@ -242,7 +237,7 @@ class SpeechTagger2Gram(object):
 		print "Parsing test file " + path
 		testArrays = self.parseTestFile(path)
 		tokens = testArrays[0]
-		fileWords = testArrays[1][0:200]
+		fileWords = testArrays[1][0:25]
 		POS = testArrays[2]
 		testCounts = testArrays[3]
 		
