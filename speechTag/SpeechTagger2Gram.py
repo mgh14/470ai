@@ -152,18 +152,24 @@ class SpeechTagger2Gram(object):
 					(prob, state) = max((V[k-1][(twoPrevState,prevState)] + math.log(transProbs.get((twoPrevState,prevState),{}).get(currState,self.defaultProb)) + math.log(emitProbs[currState].get(wordSequence[k], self.defaultProb)), twoPrevState) for twoPrevState in states)
 
 					V[k][(prevState,currState)] = prob
-			
+
+			# re-assign to most likely key
+			(myprob, mykey) = max((V[k-1][key],key) for key in V[k-1].keys())
+			V[k-1] = mykey
+
+		# do once more for the last entry in V
+		(myprob, mykey) = max((V[k][key],key) for key in V[k].keys())			
+		V[k] = mykey
+
 		n = 0
 		if len(wordSequence) != 1:
 			n = k
 		
 		path = []
 		for n in range(1,len(V)):
-			state = V[n]
-			
-			(myprob, mykey) = max((state[key],key) for key in state.keys())
-			path += [mykey[0]]
-		return (prob, path) 
+			path += [V[n][0]]
+
+		return path
 
 	def generateText(self, nGramSeed, numWordsToGenerate):
 		print
@@ -237,7 +243,7 @@ class SpeechTagger2Gram(object):
 		print "Parsing test file " + path
 		testArrays = self.parseTestFile(path)
 		tokens = testArrays[0]
-		fileWords = testArrays[1][0:25]
+		fileWords = testArrays[1]
 		POS = testArrays[2]
 		testCounts = testArrays[3]
 		
@@ -245,7 +251,7 @@ class SpeechTagger2Gram(object):
 		print str(len(fileWords)) + " words to be classified from " + self.TEST_PATH
 		print "Running Viterbi..."
 		startTime = time.time()
-		(prob, tags) = self.viterbi(fileWords,self.POSdict,self.HMMstartProbability,self.HMMtransition,self.HMMemission)
+		tags = self.viterbi(fileWords,self.POSdict,self.HMMstartProbability,self.HMMtransition,self.HMMemission)
 		print "Finished classifying in " + str(time.time() - startTime) + " seconds."
 		
 		# print out statistics
