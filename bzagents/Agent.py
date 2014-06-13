@@ -46,7 +46,7 @@ class Agent(object):
 
 	def registerAgent(self):		
 		self.socket.write("agent 1" + self.SERVER_DELIMITER)
-		print "Registration Successful"
+		print "Registration Successful on port " + str(self.port)
 
 	def loadConstants(self):
 		constList = self._query("constants")
