@@ -12,7 +12,7 @@ class KalmanFinalAgent(PFFinalAgent):
 	WAIT = .2 #wait time between filter updates
 	NOISE = 5 #noise for filter, The lab makes it sound like it should be set to 5
 	TANK_NUM = 0
-	ANG_VEL = .3
+	ANG_VEL = .2
 
 	#used for visualization
 	#predictionGrid1 = []
@@ -37,7 +37,7 @@ class KalmanFinalAgent(PFFinalAgent):
 		#self.resetPredictionGrid(self.predictionGrid2)
 		
 		
-	def get_new_target(self, enemy, tankNum, kalmanFilterNum, target):
+	def get_new_target(self, enemy, tankNum, kalmanFilterNum, whichKalman):
 		# Insert kalman filter here
 		enemy_status = enemy[2]
 		enemyPosition = self.getAdjustedPoint([float(enemy[4]),float(enemy[5])])
@@ -49,12 +49,24 @@ class KalmanFinalAgent(PFFinalAgent):
 			delta_t = self.distance(myPosition, (x, y)) / self.SHOT_SPEED
 			x, y = kalmanFilterNum.get_target(delta_t)
 			#self.drawPredictionGrid(x,y,predictionGridNum)
-			target = (x, y, True)
+			val = (x, y, True)
+			if(whichKalman == 1):
+				self.target1 = val
+			elif(whichKalman == 2):
+				self.target2 = val
 		else:
 			#self.resetPredictionGrid(predictionGridNum)
-			x, y, t = target
+			if(whichKalman == 1):
+				x, y, t = self.target1
+			elif(whichKalman == 2):
+				x, y, t = self.target2
 			kalmanFilterNum.reset()
-			target = (x, y, False)
+
+			val = (x, y, False)
+			if(whichKalman == 1):
+				self.target1 = val
+			elif(whichKalman == 2):
+				self.target2 = val
 			
 	def tank_controller(self, counter, threshold, tankNum, target):
 		tankPoint = self.getMyPosition(tankNum)
@@ -67,17 +79,16 @@ class KalmanFinalAgent(PFFinalAgent):
 		target_angle = self.getAdjustedAngle(math.atan2(target_y - tankPoint[1],target_x - tankPoint[0]))
 		relative_angle = abs(target_angle - tank_angle)
 
-
-		#if(counter == threshold):
-		#	otherTank = self._query("othertanks")[0]
-		#	hisPosition = self.getAdjustedPoint([float(otherTank[4]),float(otherTank[5])])
-		#	print "\nhisPos: " + str(hisPosition)
-		#	print "target: " + str(self.target)
-		#	print "targAng: " + str(target_angle) + "; relAng: " + str(relative_angle) 
+		#if(counter % 5 == threshold-145):
+		if(False):
+			hisPosition = self.getAdjustedPoint([float(target[0]),float(target[1])])
+			print "\nhisPos: " + str(hisPosition)
+			print "target: " + str(target)
+			print "targAng: " + str(target_angle) + "; relAng: " + str(relative_angle) 
 		
 
 		#if relative_angle <= math.pi and alive:
-		angleTolerance = .001
+		angleTolerance = .01
 		if relative_angle <= angleTolerance and alive:
 			#print "shoot!"
 			self.commandAgent("shoot " + str(tankNum))

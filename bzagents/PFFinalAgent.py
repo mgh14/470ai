@@ -52,7 +52,7 @@ class PFFinalAgent(Agent):
 			for y in range((-1*self.worldHalfSize),self.worldHalfSize):
 				self.calculateAttractiveFieldAtPoint(x,y,attractiveGoalParam)
 	
-	def calculateAttractiveFieldAtPoint(self, x, y, goals):
+	def calculateAttractiveFieldAtPoint(self, x, y, goals, fieldX, fieldY):
 		fieldStrength = 1
 		
 		innerRadius = 25
@@ -60,10 +60,11 @@ class PFFinalAgent(Agent):
 	
 		deltaX = 0
 		deltaY = 0
-		distance = 10000
+		distance = 99999999999
 		goalX = self.NOT_SET
 		goalY = self.NOT_SET
 	
+		#theta = 0
 		for goal in goals:
 			gX = goal[0]
 			gY = goal[1]
@@ -73,6 +74,10 @@ class PFFinalAgent(Agent):
 				goalY = gY
 				distance = currDistance
 				theta = math.atan2((goalY-y),(goalX-x))
+
+		if(distance == 99999999999):
+			print "check"
+			theta = 0
 
 		const = fieldStrength * (distance-innerRadius)
 		if distance < innerRadius:
@@ -86,8 +91,8 @@ class PFFinalAgent(Agent):
 			deltaY = const * math.sin(theta)
 	
 		# assign deltas to delta x, delta y fields		
-		self.fieldX[x][y] += deltaX
-		self.fieldY[x][y] += deltaY
+		fieldX[x][y] += deltaX
+		fieldY[x][y] += deltaY
 		self.desiredHeading = self.getAdjustedAngle(theta)
 
 	def _getAttractiveGoalParam(self):

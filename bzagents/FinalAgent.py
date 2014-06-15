@@ -368,14 +368,28 @@ class FinalAgent(KalmanFinalAgent):
 		y = random.randint(1,7)
 		self.currNodeToVisit = [(x*100-self.worldHalfSize,y*100-self.worldHalfSize)]
 		return self.currNodeToVisit
-		
+	
+	def getClosestEnemy(self,tankNum):
+		enemyData = self._query("othertanks")
+		target = False
+		shortestDistance = 999999999999
+		closestTankIndex = -1
+		myTankPos = self._getCurrentPositionOfTank(tankNum)
+		for key, entry in enumerate(enemyData):
+			enemyPoint = self.getAdjustedPoint((float(entry[4]),float(entry[5])))
+			distance = self.distance(enemyPoint,myTankPos)
+			if(distance < shortestDistance):
+				shortestDistance = distance
+				closestTankIndex = key
+		#print "closest: " + str(enemyData[closestTankIndex])
+		return enemyData[closestTankIndex]
 		
 	def play(self):
 		### POTENTIAL FIELDS###
-		tankNum = 2
-		tanksInfo = self._query("mytanks")
+		tankNum = 3
+		#tanksInfo = self._query("mytanks")
 
-		angle = self.getAdjustedAngle(float(tanksInfo[tankNum][8]))
+		#angle = self.getAdjustedAngle(float(tanksInfo[tankNum][8]))
 
 		# assign shooting tolerance (tolerance is a measure of time)
 		shootTolerance = self.getRandomShotTolerance()
@@ -388,7 +402,7 @@ class FinalAgent(KalmanFinalAgent):
 		threshold = 150
 		
 		### OCCGRID ###		
-		'''captureTank = self.EXPLORING_TANK
+		captureTank = self.EXPLORING_TANK
 
 		updateNodeTolerance = 20
 		self.visitNodeTime = time.time()
@@ -396,41 +410,42 @@ class FinalAgent(KalmanFinalAgent):
 		tankXPos = int(tanksInfo[captureTank][6])
 		tankYPos = int(tanksInfo[captureTank][7])
 		self.setNextUnvisitedNode()
-		self.calculateAttractiveFieldAtPoint(tankXPos,tankYPos,self.currNodeToVisit)
+		self.calculateAttractiveFieldAtPoint(tankXPos,tankYPos,self.currNodeToVisit,self.occFieldX,self.occFieldY)
 		#print self.currNodeToVisit'''
 
 		while True:
-			### PFAgent ###			
-			currTime = time.time()
-			tanksInfo = self._query("mytanks")
-			tankXPos = int(tanksInfo[tankNum][6])
-			tankYPos = int(tanksInfo[tankNum][7])
-			self.calculateAttractiveFieldAtPoint(tankXPos,tankYPos,self._getAttractiveGoalParam())
+			### PFAgent ###		
+			currTime = time.time()	
+			for tankNum in range(3,4):
+				tanksInfo = self._query("mytanks")
+				tankXPos = int(tanksInfo[tankNum][6])
+				tankYPos = int(tanksInfo[tankNum][7])
+				self.calculateAttractiveFieldAtPoint(tankXPos,tankYPos,self._getAttractiveGoalParam(), self.fieldX, self.fieldY)
 
-			# check to see if the tank should shoot
-			if(shootTolerance < (currTime - shootTime) and not self._isCoordinateInBase((tankXPos,tankYPos))):
+				# check to see if the tank should shoot
+				#if(shootTolerance < (currTime - shootTime))):
 				self.commandAgent("shoot " + str(tankNum))
-				shootTime = currTime
-				shootTolerance = self.getRandomShotTolerance()
+				#	shootTime = currTime
+				#	shootTolerance = self.getRandomShotTolerance()
 
-			# check to see if the tank should rotate.
-			# Once pointed the right way crank up the speed! (v1!)
-			tankHeading = self.getAdjustedAngle(float(tanksInfo[tankNum][8]))
-			if tankHeading > self.desiredHeading + self.HEADING_TOLERANCE:
-				self.commandAgent("angvel " + str(tankNum) + " -0.75")
-			elif tankHeading < self.desiredHeading - self.HEADING_TOLERANCE:
-				self.commandAgent("angvel " + str(tankNum) + " 0.75")
-			else:
-				self.commandAgent("angvel " + str(tankNum) + " 0")
+				# check to see if the tank should rotate.
+				# Once pointed the right way crank up the speed! (v1!)
+				tankHeading = self.getAdjustedAngle(float(tanksInfo[tankNum][8]))
+				if tankHeading > self.desiredHeading + self.HEADING_TOLERANCE:
+					self.commandAgent("angvel " + str(tankNum) + " -0.75")
+				elif tankHeading < self.desiredHeading - self.HEADING_TOLERANCE:
+					self.commandAgent("angvel " + str(tankNum) + " 0.75")
+				else:
+					self.commandAgent("angvel " + str(tankNum) + " 0")
 
-				magnitude = (self.fieldX[tankXPos][tankYPos]**2+self.fieldY[tankXPos][tankYPos]**2)**.5
-				if(magnitude > 1):
-					magnitude = 1
-				if(magnitude < -1):
-					magnitude = -1
-				if(magnitude == 0):
-					magnitude = .3
-				self.commandAgent("speed " + str(tankNum) + " " + str(magnitude))
+					magnitude = (self.fieldX[tankXPos][tankYPos]**2+self.fieldY[tankXPos][tankYPos]**2)**.5
+					if(magnitude > 1):
+						magnitude = 1
+					if(magnitude < -1):
+						magnitude = -1
+					if(magnitude == 0):
+						magnitude = .3
+					self.commandAgent("speed " + str(tankNum) + " " + str(magnitude))
 
 			### KALMAN ###
 			now = time.time()
@@ -443,13 +458,12 @@ class FinalAgent(KalmanFinalAgent):
 			kalman1 = queryRes[self.KALMAN_TANK_1]
 			kalman2 = queryRes[self.KALMAN_TANK_2]
 
-			queryRes = self._query("othertanks")
-			target1 = self._query("othertanks")[0]
-			target2 = target1
+			target1 = self.getClosestEnemy(self.KALMAN_TANK_1)
+			target2 = self.getClosestEnemy(self.KALMAN_TANK_2)
 			if self.delta >= self.WAIT:
 			
-				self.get_new_target(target1, self.KALMAN_TANK_1, self.kalmanFilter1, self.target1)
-				self.get_new_target(target2, self.KALMAN_TANK_2, self.kalmanFilter2, self.target2)
+				self.get_new_target(target1, self.KALMAN_TANK_1, self.kalmanFilter1, 1)
+				self.get_new_target(target2, self.KALMAN_TANK_2, self.kalmanFilter2, 2)
 				self.delta = 0.0
 			
 			self.tank_controller(counter, threshold, self.KALMAN_TANK_1, self.target1)
@@ -460,18 +474,18 @@ class FinalAgent(KalmanFinalAgent):
 				counter = 0
 
 			### OCC ### 
-			'''currTime = time.time()
+			currTime = time.time()
 			tanksInfo = self._query("mytanks")
 			if(updateNodeTolerance < (currTime - self.visitNodeTime)):
 				self.visitNodeTime = time.time()	
 				self.setNextUnvisitedNode()
-				self.calculateAttractiveFieldAtPoint(tankXPos,tankYPos,self.currNodeToVisit)
-				print self.currNodeToVisit
+				self.calculateAttractiveFieldAtPoint(tankXPos,tankYPos,self.currNodeToVisit, self.occFieldX, self.occFieldY)
+				#print self.currNodeToVisit
 			
 			tanksInfo = self._query("mytanks")
 			tankXPos = int(tanksInfo[captureTank][6])
 			tankYPos = int(tanksInfo[captureTank][7])
-			self.calculateAttractiveFieldAtPoint(tankXPos,tankYPos,self.currNodeToVisit)
+			self.calculateAttractiveFieldAtPoint(tankXPos,tankYPos,self.currNodeToVisit,self.occFieldX,self.occFieldY)
 			self.updateProbabilities(captureTank)
 			self.drawGrid()
 			
@@ -490,5 +504,5 @@ class FinalAgent(KalmanFinalAgent):
 					magnitude = 1
 				if(magnitude < -1):
 					magnitude = -1
-				self.commandAgent("speed " + str(captureTank) + " " + str(magnitude))'''
+				self.commandAgent("speed " + str(captureTank) + " " + str(magnitude))
 	
