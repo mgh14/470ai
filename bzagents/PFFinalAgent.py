@@ -18,10 +18,10 @@ class PFFinalAgent(Agent):
 		self._initializePF()
 
 	def _initializePF(self):
-		for x in range((-1*self.worldHalfSize),self.worldHalfSize):
+		for x in range(0,self.worldHalfSize*2):
 			colX = []
 			colY = []
-			for y in range((-1*self.worldHalfSize),self.worldHalfSize):
+			for y in range(0,self.worldHalfSize*2):
 				colX.append(0)
 				colY.append(0)
 			self.fieldX.append(colX)
@@ -35,8 +35,8 @@ class PFFinalAgent(Agent):
 	
 		attractiveGoalParam = self._getAttractiveGoalParam()
 		myFlagCaptured = self._isMyFlagCaptured()
-		for x in range((-1*self.worldHalfSize),self.worldHalfSize):
-			for y in range((-1*self.worldHalfSize),self.worldHalfSize):
+		for x in range(0,self.worldHalfSize*2):
+			for y in range(0,self.worldHalfSize*2):
 				self.calculateAttractiveFieldAtPoint(x,y,attractiveGoalParam)
 
 				for tank in otherTanks:
@@ -48,11 +48,16 @@ class PFFinalAgent(Agent):
 	### attractive field methods
 	def calculateAttractivePF(self):
 		attractiveGoalParam = self._getAttractiveGoalParam()		
-		for x in range((-1*self.worldHalfSize),self.worldHalfSize):
-			for y in range((-1*self.worldHalfSize),self.worldHalfSize):
+		for x in range(0,self.worldHalfSize*2):
+			for y in range(0,self.worldHalfSize*2):
 				self.calculateAttractiveFieldAtPoint(x,y,attractiveGoalParam)
 	
 	def calculateAttractiveFieldAtPoint(self, x, y, goals, fieldX, fieldY):
+		x = int(x)
+		y = int(y)
+
+		if(fieldX == self.fieldX and fieldY == self.fieldY):
+			print "goals: " + str(goals)		
 		fieldStrength = 1
 		
 		innerRadius = 25
@@ -64,7 +69,7 @@ class PFFinalAgent(Agent):
 		goalX = self.NOT_SET
 		goalY = self.NOT_SET
 	
-		#theta = 0
+		# find closest goal
 		for goal in goals:
 			gX = goal[0]
 			gY = goal[1]
@@ -75,8 +80,9 @@ class PFFinalAgent(Agent):
 				distance = currDistance
 				theta = math.atan2((goalY-y),(goalX-x))
 
+		#if(fieldX == self.fieldX):
+		#	print str(x) + "," + str(y) + "; " + str(goalX) + "," + str(goalY)
 		if(distance == 99999999999):
-			print "check"
 			theta = 0
 
 		const = fieldStrength * (distance-innerRadius)
@@ -90,7 +96,11 @@ class PFFinalAgent(Agent):
 			deltaX = const * math.cos(theta)
 			deltaY = const * math.sin(theta)
 	
-		# assign deltas to delta x, delta y fields		
+		# assign deltas to delta x, delta y fields	
+		if(x > self.worldHalfSize*2):
+			x -= 1
+		if(y > self.worldHalfSize*2):
+			y -= 1	
 		fieldX[x][y] += deltaX
 		fieldY[x][y] += deltaY
 		self.desiredHeading = self.getAdjustedAngle(theta)
@@ -98,6 +108,7 @@ class PFFinalAgent(Agent):
 	def _getAttractiveGoalParam(self):
 		param = self._getEnemyFlagPositions()
 		if(self._iHaveEnemyFlag()):
+			print "mybasecoords: " + str(self.myBaseCoords[0])
 			param = [self.myBaseCoords[0]]
 
 		return param
@@ -111,11 +122,14 @@ class PFFinalAgent(Agent):
 		
 		# check distance from point to each enemy tank
 		for tank in otherTanks:
-			for x in range((-1*self.worldHalfSize),self.worldHalfSize):
-				for y in range((-1*self.worldHalfSize),self.worldHalfSize):
+			for x in range(0,self.worldHalfSize*2):
+				for y in range(0,self.worldHalfSize*2):
 					self.calculateRepulsiveFieldAtPoint(x,y,tank)
 
 	def calculateRepulsiveFieldAtPoint(self, x, y, tank):
+		x = int(x)
+		y = int(y)
+
 		distance = self.getDistanceToEnemyTank(x,y,tank)
 		if(distance > self.SEMI_CLOSE_TO_ENEMY):
 			return
@@ -141,6 +155,10 @@ class PFFinalAgent(Agent):
 		if(deltaX == 0 and deltaY == 0):
 			return
 
+		if(x >= 2*self.worldHalfSize):
+			x = 2*self.worldHalfSize - 1
+		if(y >= 2*self.worldHalfSize):
+			y -= 2*self.worldHalfSize - 1
 		self.fieldX[x][y] += deltaX
 		self.fieldY[x][y] += deltaY
 
@@ -168,8 +186,8 @@ class PFFinalAgent(Agent):
 	### tangential field methods
 	def calculateTangentialPF(self):
 		# check distance from point to each enemy tank
-		for x in range((-1*self.worldHalfSize),self.worldHalfSize):
-			for y in range((-1*self.worldHalfSize),self.worldHalfSize):
+		for x in range(0,self.worldHalfSize*2):
+			for y in range(0,self.worldHalfSize*2):
 				self.calculateTangentialFieldAtPoint(x,y,self.myFlagStand)
 	
 	def calculateTangentialFieldAtPoint(self,x,y,flagStand):
@@ -196,6 +214,11 @@ class PFFinalAgent(Agent):
 		if(deltaX == 0 and deltaY == 0):
 			return
 
+		if(x >= self.worldHalfSize*2):
+			x = self.worldHalfSize*2 - 1
+		if(y >= self.worldHalfSize*2):
+			y = self.worldHalfSize*2 - 1
+
 		self.fieldX[x][y] += deltaX
 		self.fieldY[x][y] += deltaY
 		return
@@ -215,10 +238,13 @@ class PFFinalAgent(Agent):
 
 		while 1:
 			currTime = time.time()
-			tanksInfo = self._query("mytanks")
-			tankXPos = int(tanksInfo[captureTank][6])
-			tankYPos = int(tanksInfo[captureTank][7])
-			self.calculateAttractiveFieldAtPoint(tankXPos,tankYPos,self._getAttractiveGoalParam())
+			#tanksInfo = self._query("mytanks")
+			#tankXPos = int(tanksInfo[captureTank][6])
+			#tankYPos = int(tanksInfo[captureTank][7])
+			tankPos = self._getCurrentPositionOfTank(0)
+			tankXPos = int(tankPos[0])
+			tankYPos = int(tankPos[1])
+			self.calculateAttractiveFieldAtPoint(int(tankXPos),int(tankYPos),self._getAttractiveGoalParam())
 			
 			# check to see if the tank should shoot
 			if(shootTolerance < (currTime - shootTime) and not self._isCoordinateInBase((tankXPos,tankYPos))):

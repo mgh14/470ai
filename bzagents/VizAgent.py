@@ -168,11 +168,10 @@ def calculate_attractive_field(x, y, goals):
 	
 	
 	
-'''ag = Agent("localhost", 57426);
-
+ag = Agent("localhost", 37167);
 
 outfile = open(FILENAME, 'w')
 print >>outfile, gnuplot_header(-WORLDSIZE / 2, WORLDSIZE / 2)
-print >>outfile, draw_obstacles(ag.getObstacles())
+#print >>outfile, draw_obstacles(ag._query("obstacles"))
 field_function = generate_field_function(150)
-print >>outfile, plot_field(calculate_attractive_field)'''
+print >>outfile, plot_field(calculate_attractive_field)

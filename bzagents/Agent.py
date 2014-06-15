@@ -54,16 +54,18 @@ class Agent(object):
 			self.constants[item[0]] = item[1]
 
 		self.worldHalfSize = int(self.constants["worldsize"]) / 2
+		print self.constants
 
 	def setMyBase(self):
 		bases = self._query("bases")
 
 		for base in bases:
 			if(base[0] == self.constants["team"]):
-				self.myBaseCoords = [(int(float(base[1])),int(float(base[2]))),
-							(int(float(base[3])),int(float(base[4]))),
-							(int(float(base[5])),int(float(base[6]))),
-							(int(float(base[7])),int(float(base[8])))]
+				point1 = self.getAdjustedPoint((int(float(base[1])),int(float(base[2]))))
+				point2 = self.getAdjustedPoint((int(float(base[3])),int(float(base[4]))))
+				point3 = self.getAdjustedPoint((int(float(base[5])),int(float(base[6]))))
+				point4 = self.getAdjustedPoint((int(float(base[7])),int(float(base[8]))))
+				self.myBaseCoords = [point1,point2,point3,point4]
 
 				return
 
@@ -74,7 +76,8 @@ class Agent(object):
 		
 		for flag in flags:
 			if(flag[0] == self.constants["team"]):
-				self.myFlagStand = [int(float(flag[2])),int(float(flag[3]))]
+				flagPoint = self.getAdjustedPoint((int(float(flag[2])),int(float(flag[3]))))
+				self.myFlagStand = [flagPoint[0],flagPoint[1]]
 
 	def commandAgent(self, command):
 		#print "Cmd: " + command
@@ -162,7 +165,8 @@ class Agent(object):
 
 		for flag in flags:
 			if(flag[0] == self.constants["team"]):
-				return [int(float(flag[2])),int(float(flag[3]))]
+				flagPoint = self.getAdjustedPoint((int(float(flag[2])),int(float(flag[3]))))
+				return [flagPoint[0],flagPoint[1]]
 
 		return [-10000,-10000]	# represents an error (should be found above)
 
@@ -174,7 +178,8 @@ class Agent(object):
 			if(flag[0] == self.constants["team"]):
 				continue
 
-			positions.append((int(float(flag[2])),int(float(flag[3]))))
+			flagPos = self.getAdjustedPoint((int(float(flag[2])),int(float(flag[3]))))
+			positions.append(flagPos)
 
 		return positions
 
