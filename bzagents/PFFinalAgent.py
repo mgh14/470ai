@@ -96,11 +96,15 @@ class PFFinalAgent(Agent):
 			deltaX = const * math.cos(theta)
 			deltaY = const * math.sin(theta)
 	
-		# assign deltas to delta x, delta y fields	
-		if(x > self.worldHalfSize*2):
-			x -= 1
-		if(y > self.worldHalfSize*2):
-			y -= 1	
+		# assign deltas to delta x, delta y fields
+		if(x >= 2*self.worldHalfSize):
+			x = 2*self.worldHalfSize - 1
+		if(y >= 2*self.worldHalfSize):
+			y = 2*self.worldHalfSize - 1
+		if(x < 0 ):
+			x = 0;
+		if(y < 0):
+			y = 0;	
 		fieldX[x][y] += deltaX
 		fieldY[x][y] += deltaY
 		self.desiredHeading = self.getAdjustedAngle(theta)
@@ -158,7 +162,11 @@ class PFFinalAgent(Agent):
 		if(x >= 2*self.worldHalfSize):
 			x = 2*self.worldHalfSize - 1
 		if(y >= 2*self.worldHalfSize):
-			y -= 2*self.worldHalfSize - 1
+			y = 2*self.worldHalfSize - 1
+		if(x < 0 ):
+			x = 0;
+		if(y < 0):
+			y = 0;
 		self.fieldX[x][y] += deltaX
 		self.fieldY[x][y] += deltaY
 
@@ -218,7 +226,10 @@ class PFFinalAgent(Agent):
 			x = self.worldHalfSize*2 - 1
 		if(y >= self.worldHalfSize*2):
 			y = self.worldHalfSize*2 - 1
-
+		if(x < 0 ):
+			x = 0;
+		if(y < 0):
+			y = 0;
 		self.fieldX[x][y] += deltaX
 		self.fieldY[x][y] += deltaY
 		return
